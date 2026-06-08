@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initScrollReveal();
   initProjectFilter();
   initContactForm();
+  initTypewriter();
 });
 
 /* ==========================================
@@ -362,12 +363,44 @@ function initContactForm() {
       </svg> Sending message...
     `;
 
-    setTimeout(() => {
+    // Web3Forms Integration
+    const accessKey = "e1667dec-80cf-4c3a-ab85-bf5ec7e8d755"; // Get your key from web3forms.com
+    
+
+
+    const formData = {
+      name: name,
+      email: email,
+      subject: subject,
+      message: message,
+      access_key: accessKey
+    };
+
+    fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    })
+    .then(async (response) => {
+      const resData = await response.json();
       submitBtn.disabled = false;
       submitBtn.innerHTML = originalText;
-      showStatus('Thank you! Your message was sent successfully. Afsal will get back to you shortly.', 'success');
-      form.reset();
-    }, 1500);
+      
+      if (response.status === 200) {
+        showStatus('Thank you! Your message was sent successfully. Afsal will get back to you shortly.', 'success');
+        form.reset();
+      } else {
+        showStatus(resData.message || 'An error occurred. Please try again or email directly.', 'error');
+      }
+    })
+    .catch((error) => {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+      showStatus('Network error. Please try again or email directly.', 'error');
+    });
   });
 
   function validateEmail(email) {
@@ -391,4 +424,44 @@ function initContactForm() {
       }, 7000);
     }
   }
+}
+
+/* ==========================================
+   8. TYPEWRITER EFFECT
+   ========================================== */
+function initTypewriter() {
+  const element = document.getElementById('typing-sub');
+  if (!element) return;
+
+  const roles = ["Full-Stack Developer", "GenAI Architect", "Systems Engineer"];
+  let roleIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let typingSpeed = 100;
+
+  function type() {
+    const currentRole = roles[roleIndex];
+    if (isDeleting) {
+      element.textContent = currentRole.substring(0, charIndex - 1);
+      charIndex--;
+      typingSpeed = 50;
+    } else {
+      element.textContent = currentRole.substring(0, charIndex + 1);
+      charIndex++;
+      typingSpeed = 100;
+    }
+
+    if (!isDeleting && charIndex === currentRole.length) {
+      typingSpeed = 2000; // Pause at end of role
+      isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      roleIndex = (roleIndex + 1) % roles.length;
+      typingSpeed = 500; // Pause before starting next role
+    }
+
+    setTimeout(type, typingSpeed);
+  }
+
+  type();
 }
