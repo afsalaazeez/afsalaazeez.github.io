@@ -268,102 +268,217 @@ import * as THREE from 'three';
   // ========================================================================
   // CAR
   // ========================================================================
-  // Detailed low-poly roadster. Front of the car points toward +Z.
+  // Hardcore tube-frame rock crawler buggy. Front of the car points toward +Z.
+  // Fully exposed CNC-bent tube chassis + cage, portal axles, triangulated
+  // 4-link, long-travel coilovers, driveshafts, beadlock rims + mud tires.
   const car = new THREE.Group();
 
-  const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x00f2fe, metalness: 0.7, roughness: 0.25,
-    emissive: 0x00343a, emissiveIntensity: 0.35,
-  });
-  const accentMat = new THREE.MeshStandardMaterial({
-    color: 0x7f00ff, metalness: 0.6, roughness: 0.3,
-    emissive: 0x2a0a4a, emissiveIntensity: 0.4,
-  });
-  const trimMat = new THREE.MeshStandardMaterial({ color: 0x0b0e16, metalness: 0.5, roughness: 0.6 });
-  const glassMat = new THREE.MeshStandardMaterial({
-    color: 0x081018, metalness: 0.4, roughness: 0.1,
-    transparent: true, opacity: 0.55,
-  });
-  const tireMat = new THREE.MeshStandardMaterial({ color: 0x0b0e16, roughness: 0.85, metalness: 0.1 });
-  const rimMat = new THREE.MeshStandardMaterial({
-    color: 0x00f2fe, metalness: 0.9, roughness: 0.2,
-    emissive: 0x00343a, emissiveIntensity: 0.4,
-  });
+  // --- Materials ---
+  const steelMat  = new THREE.MeshStandardMaterial({ color: 0x39414f, metalness: 0.95, roughness: 0.4 });
+  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x0bb6c4, metalness: 0.85, roughness: 0.3, emissive: 0x022f33, emissiveIntensity: 0.25 });
+  const castMat   = new THREE.MeshStandardMaterial({ color: 0x262b35, metalness: 0.85, roughness: 0.55 });
+  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xb9c6d6, metalness: 1.0, roughness: 0.15 });
+  const springMat = new THREE.MeshStandardMaterial({ color: 0x7f00ff, metalness: 0.6, roughness: 0.35, emissive: 0x1a0033, emissiveIntensity: 0.45 });
+  const tireMat   = new THREE.MeshStandardMaterial({ color: 0x0a0c12, metalness: 0.1, roughness: 0.95 });
+  const rimMat    = new THREE.MeshStandardMaterial({ color: 0x00f2fe, metalness: 0.95, roughness: 0.18, emissive: 0x00343a, emissiveIntensity: 0.4 });
+  const boltMat   = new THREE.MeshStandardMaterial({ color: 0x8895a6, metalness: 0.9, roughness: 0.3 });
+  const seatMat   = new THREE.MeshStandardMaterial({ color: 0x141821, metalness: 0.2, roughness: 0.85 });
 
-  // Helper: add a box/sphere part to the car
-  function addPart(geo, mat, x, y, z, opts = {}) {
-    const m = new THREE.Mesh(geo, mat);
-    m.position.set(x, y, z);
-    m.castShadow = opts.cast !== false;
-    car.add(m);
+  const UPV = new THREE.Vector3(0, 1, 0);
+  const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpD = new THREE.Vector3();
+
+  // Tube between two points — the building block for chassis / cage / links
+  function strut(parent, p1, p2, r, mat, cast = true) {
+    tmpA.set(p1[0], p1[1], p1[2]); tmpB.set(p2[0], p2[1], p2[2]);
+    tmpD.subVectors(tmpB, tmpA);
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(r, r, tmpD.length(), 8), mat);
+    m.position.copy(tmpA).addScaledVector(tmpD, 0.5);
+    m.quaternion.setFromUnitVectors(UPV, tmpD.normalize());
+    m.castShadow = cast;
+    parent.add(m);
     return m;
   }
+  function slab(parent, w, h, d, mat, x, y, z, cast = true) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    m.position.set(x, y, z); m.castShadow = cast; parent.add(m); return m;
+  }
+  function drum(parent, rt, rb, h, mat, x, y, z, axis, cast = true) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, h, 16), mat);
+    m.position.set(x, y, z);
+    if (axis === 'x') m.rotation.x = Math.PI / 2;
+    if (axis === 'z') m.rotation.z = Math.PI / 2;
+    m.castShadow = cast; parent.add(m); return m;
+  }
 
-  // Body: low slung base + raised hood and rear deck
-  addPart(new THREE.BoxGeometry(2, 0.5, 3.5), bodyMat, 0, 0.62, 0);
-  addPart(new THREE.BoxGeometry(1.8, 0.34, 1.7), bodyMat, 0, 0.94, 0.75);   // hood
-  addPart(new THREE.BoxGeometry(1.8, 0.34, 1.0), bodyMat, 0, 0.94, -1.05);  // rear deck
-  addPart(new THREE.BoxGeometry(2.06, 0.14, 3.0), accentMat, 0, 0.5, 0);    // side skirt
+  // ---- Tube chassis + integrated roll cage (right-side nodes, mirrored) ----
+  const CAGE = {
+    lf: [0.82, 0.55, 1.55], lm: [0.9, 0.46, 0.15], lr: [0.82, 0.6, -1.55],
+    af: [0.74, 1.2, 1.05],  rf: [0.7, 2.0, 0.4],   rr: [0.7, 2.0, -0.7],
+    dr: [0.8, 1.15, -1.6],  bf: [0.66, 0.92, 2.0], db: [0.74, 1.2, 0.55],
+  };
+  const mir = (k) => [-CAGE[k][0], CAGE[k][1], CAGE[k][2]];
+  const sideEdges = [
+    ['lf','lm'],['lm','lr'],['lf','af'],['af','rf'],['rf','rr'],['rr','dr'],
+    ['dr','lr'],['lm','rf'],['af','bf'],['lf','bf'],['db','af'],['db','lm'],['lr','rr'],
+  ];
+  sideEdges.forEach(([a, b]) => {
+    strut(car, CAGE[a], CAGE[b], 0.06, cageMat);
+    strut(car, mir(a), mir(b), 0.06, cageMat);
+  });
+  // Cross members + roof X-brace (right node -> left node)
+  [['af','af'],['rf','rf'],['rr','rr'],['dr','dr'],['bf','bf'],['lf','lf'],
+   ['lr','lr'],['db','db'],['rf','rr'],['rr','rf']].forEach(([a, b]) =>
+    strut(car, CAGE[a], mir(b), 0.055, cageMat));
+  // Welded node gussets
+  Object.keys(CAGE).forEach((k) => {
+    [1, -1].forEach((s) => {
+      const g = new THREE.Mesh(new THREE.SphereGeometry(0.075, 8, 8), steelMat);
+      g.position.set(s * CAGE[k][0], CAGE[k][1], CAGE[k][2]); car.add(g);
+    });
+  });
 
-  // Glass cabin + coloured roof + roof light bar
-  addPart(new THREE.BoxGeometry(1.42, 0.52, 1.5), glassMat, 0, 1.26, -0.1);
-  addPart(new THREE.BoxGeometry(1.5, 0.12, 1.55), accentMat, 0, 1.56, -0.1); // roof
-  addPart(new THREE.BoxGeometry(1.05, 0.07, 0.14),
-    new THREE.MeshBasicMaterial({ color: 0x00f2fe }), 0, 1.63, 0.45, { cast: false }); // light bar
+  // ---- Cockpit: minimalist firewall, seats, steering ----
+  slab(car, 1.5, 0.7, 0.05, steelMat, 0, 1.05, -0.35, false);   // firewall
+  [-0.34, 0.34].forEach((sx) => {
+    slab(car, 0.5, 0.12, 0.5, seatMat, sx, 0.95, -0.05, false);
+    slab(car, 0.46, 0.6, 0.1, seatMat, sx, 1.28, -0.27, false);
+  });
+  const col = drum(car, 0.03, 0.03, 0.5, castMat, 0.34, 1.2, 0.42, null, false);
+  col.rotation.x = Math.PI / 3.2;
+  const sWheel = new THREE.Mesh(new THREE.TorusGeometry(0.16, 0.03, 8, 18), castMat);
+  sWheel.position.set(0.34, 1.33, 0.52); sWheel.rotation.x = Math.PI / 3.2; car.add(sWheel);
 
-  // Bumpers
-  addPart(new THREE.BoxGeometry(1.85, 0.24, 0.2), trimMat, 0, 0.5, 1.72);
-  addPart(new THREE.BoxGeometry(1.85, 0.24, 0.2), trimMat, 0, 0.5, -1.72);
+  // ---- Engine block + transfer case (drivetrain origin) ----
+  slab(car, 0.82, 0.7, 1.0, castMat, 0, 0.88, -1.05);
+  slab(car, 0.5, 0.3, 0.5, steelMat, 0, 0.62, -0.25, false);
+  strut(car, [0.32, 0.55, -1.5], [0.5, 1.35, -1.62], 0.05, chromeMat); // exhaust
 
-  // Headlights (front, +Z) and taillights (rear, -Z)
-  const hlMat = new THREE.MeshBasicMaterial({ color: 0xeaffff });
-  addPart(new THREE.SphereGeometry(0.14, 12, 12), hlMat, 0.62, 0.72, 1.74, { cast: false });
-  addPart(new THREE.SphereGeometry(0.14, 12, 12), hlMat, -0.62, 0.72, 1.74, { cast: false });
-  const tlMat = new THREE.MeshBasicMaterial({ color: 0xff2d55 });
-  addPart(new THREE.BoxGeometry(0.5, 0.12, 0.06), tlMat, 0.55, 0.78, -1.74, { cast: false });
-  addPart(new THREE.BoxGeometry(0.5, 0.12, 0.06), tlMat, -0.55, 0.78, -1.74, { cast: false });
+  // ---- Helpers: helical coil spring + coilover shock ----
+  function coilSpring(len, radius, coils) {
+    const segs = coils * 14, pts = [];
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs, a = t * coils * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * radius, t * len, Math.sin(a) * radius));
+    }
+    const m = new THREE.Mesh(
+      new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), segs, 0.028, 5, false),
+      springMat);
+    m.castShadow = false;
+    return m;
+  }
+  function shock(p1, p2) {
+    tmpA.set(p1[0], p1[1], p1[2]); tmpB.set(p2[0], p2[1], p2[2]);
+    tmpD.subVectors(tmpB, tmpA);
+    const len = tmpD.length();
+    const g = new THREE.Group();
+    g.add(coilSpring(len, 0.12, Math.max(5, Math.round(len * 8))));
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, len, 10), chromeMat);
+    body.position.y = len / 2; g.add(body);
+    const res = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, len * 0.4, 8), castMat);
+    res.position.set(0.14, len * 0.5, 0); g.add(res);
+    g.position.copy(tmpA);
+    g.quaternion.setFromUnitVectors(UPV, tmpD.normalize());
+    car.add(g);
+  }
 
-  // Rear spoiler
-  addPart(new THREE.BoxGeometry(0.08, 0.32, 0.1), trimMat, 0.55, 1.05, -1.5);
-  addPart(new THREE.BoxGeometry(0.08, 0.32, 0.1), trimMat, -0.55, 1.05, -1.5);
-  addPart(new THREE.BoxGeometry(1.4, 0.08, 0.42), accentMat, 0, 1.22, -1.55);
+  // ---- Solid portal axle + open diff + triangulated 4-link + coilovers ----
+  const AXLE_Y = 0.94, HUB_Y = 0.72, TRACK = 1.08;
+  function buildAxle(z) {
+    drum(car, 0.11, 0.11, TRACK * 2, castMat, 0, AXLE_Y, z, 'z'); // axle housing
+    const diff = new THREE.Mesh(new THREE.SphereGeometry(0.24, 14, 12), castMat);
+    diff.position.set(0.17, AXLE_Y, z); diff.castShadow = true; car.add(diff); // pumpkin
+    drum(car, 0.2, 0.17, 0.12, steelMat, 0.17, AXLE_Y, z + 0.22, 'x', false);   // diff cover
+    [-1, 1].forEach((s) => {
+      slab(car, 0.26, 0.36, 0.26, castMat, s * (TRACK - 0.02), (AXLE_Y + HUB_Y) / 2, z); // portal
+      // lower link (longitudinal) + upper link (triangulated inward)
+      strut(car, [s * 0.55, 0.5, z + (z > 0 ? -0.95 : 0.95)], [s * 0.78, 0.62, z], 0.05, steelMat, false);
+      strut(car, [s * 0.16, 1.12, z + (z > 0 ? -1.0 : 1.0)], [s * 0.6, 1.0, z], 0.045, steelMat, false);
+    });
+    shock([-0.82, 1.52, z], [-0.88, 0.82, z]);
+    shock([0.82, 1.52, z], [0.88, 0.82, z]);
+  }
+  buildAxle(1.3);   // front
+  buildAxle(-1.3);  // rear
 
-  // Underglow
-  const underglow = new THREE.PointLight(0x00f2fe, 6, 7);
-  underglow.position.set(0, 0.25, 0);
+  // ---- Driveshafts (transfer case -> diffs) + U-joints ----
+  strut(car, [0, 0.62, -0.3], [0.17, 0.94, 1.05], 0.06, chromeMat, false);
+  strut(car, [0, 0.62, -0.5], [0.17, 0.94, -1.1], 0.06, chromeMat, false);
+  [[0.17,0.94,1.05],[0.17,0.94,-1.1],[0,0.62,-0.4]].forEach((p) => {
+    const u = new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8), steelMat);
+    u.position.set(p[0], p[1], p[2]); car.add(u);
+  });
+
+  // ---- Skid plate, rock-slider bumpers, roof light bar ----
+  slab(car, 1.0, 0.06, 1.7, steelMat, 0, 0.4, -0.1, false);
+  strut(car, [-0.85, 0.6, 2.0], [0.85, 0.6, 2.0], 0.06, steelMat);
+  strut(car, [-0.85, 0.65, -1.95], [0.85, 0.65, -1.95], 0.06, steelMat);
+  slab(car, 1.0, 0.08, 0.12, new THREE.MeshBasicMaterial({ color: 0xeaffff }), 0, 2.02, 0.42, false);
+
+  const underglow = new THREE.PointLight(0x00f2fe, 5, 6);
+  underglow.position.set(0, 0.35, 0);
   car.add(underglow);
 
-  // Wheels: rolling on all four, steering on the front pair
+  // ---- Beadlock deep-dish wheels + oversized lugged mud tires ----
   const wheels = [];       // inner pivots that roll (rotation.x)
   const steerWheels = [];  // front outer pivots that steer (rotation.y)
 
-  function makeWheel(x, z, steerable) {
-    const outer = new THREE.Group();
-    outer.position.set(x, 0.55, z);
-    const inner = new THREE.Group();
+  // Fat tire cross-section, revolved around Y (wheel laid on its side later)
+  const tireProfile = [
+    [0.34,-0.20],[0.40,-0.22],[0.58,-0.20],[0.70,-0.13],[0.73,-0.06],
+    [0.73,0.06],[0.70,0.13],[0.58,0.20],[0.40,0.22],[0.34,0.20],
+  ].map((p) => new THREE.Vector2(p[0], p[1]));
+  const tireGeo = new THREE.LatheGeometry(tireProfile, 26);
+  const lugGeo = new THREE.BoxGeometry(0.18, 0.34, 0.14);
+
+  function buildWheel(x, z, steerable) {
+    const outer = new THREE.Group();         // steering pivot (rotation.y)
+    outer.position.set(x, HUB_Y, z);
+    const inner = new THREE.Group();          // rolling pivot (rotation.x)
     outer.add(inner);
+    const wm = new THREE.Group();             // wheel model, axle laid along X
+    wm.rotation.z = Math.PI / 2;
+    inner.add(wm);
 
-    const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.42, 20), tireMat);
-    tire.rotation.z = Math.PI / 2;
-    tire.castShadow = true;
-    inner.add(tire);
+    const tire = new THREE.Mesh(tireGeo, tireMat);
+    tire.castShadow = true; wm.add(tire);
 
-    const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.44, 14), rimMat);
-    rim.rotation.z = Math.PI / 2;
-    inner.add(rim);
+    // Aggressive deep-tread lugs around the circumference
+    for (let i = 0; i < 18; i++) {
+      const a = (i / 18) * Math.PI * 2;
+      const lug = new THREE.Mesh(lugGeo, tireMat);
+      lug.position.set(Math.cos(a) * 0.69, 0, Math.sin(a) * 0.69);
+      lug.rotation.y = -a;
+      wm.add(lug);
+    }
 
-    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.46, 8), accentMat);
-    cap.rotation.z = Math.PI / 2;
-    inner.add(cap);
+    // Deep-dish beadlock rim
+    wm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.36, 0.36, 0.42, 18), rimMat));
+    const dish = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.2, 0.22, 18), rimMat);
+    dish.position.y = 0.11; wm.add(dish);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.37, 0.025, 6, 24), boltMat);
+    ring.rotation.x = Math.PI / 2; ring.position.y = 0.21; wm.add(ring);
+    for (let i = 0; i < 12; i++) {       // beadlock bolts
+      const a = (i / 12) * Math.PI * 2;
+      const bolt = new THREE.Mesh(new THREE.CylinderGeometry(0.022, 0.022, 0.05, 6), boltMat);
+      bolt.position.set(Math.cos(a) * 0.37, 0.22, Math.sin(a) * 0.37);
+      wm.add(bolt);
+    }
+    wm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.46, 10), boltMat)); // hub
+    for (let i = 0; i < 5; i++) {        // lug nuts
+      const a = (i / 5) * Math.PI * 2;
+      const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.48, 6), boltMat);
+      nut.position.set(Math.cos(a) * 0.13, 0, Math.sin(a) * 0.13);
+      wm.add(nut);
+    }
 
     car.add(outer);
     wheels.push(inner);
     if (steerable) steerWheels.push(outer);
   }
-  makeWheel(1.02, 1.18, true);
-  makeWheel(-1.02, 1.18, true);
-  makeWheel(1.02, -1.18, false);
-  makeWheel(-1.02, -1.18, false);
+  buildWheel(1.12, 1.3, true);
+  buildWheel(-1.12, 1.3, true);
+  buildWheel(1.12, -1.3, false);
+  buildWheel(-1.12, -1.3, false);
 
   scene.add(car);
 
@@ -535,14 +650,14 @@ import * as THREE from 'three';
     const targetSteer = ((input.left ? 1 : 0) - (input.right ? 1 : 0)) * 0.5;
     steerWheels.forEach((p) => (p.rotation.y += (targetSteer - p.rotation.y) * 0.2));
 
-    // --- Chase camera ---
+    // --- Chase camera (closer + lower to show off the buggy detail) ---
     camGoal.set(
-      state.x - fx * 13,
-      9.5,
-      state.z - fz * 13
+      state.x - fx * 9.5,
+      6.8,
+      state.z - fz * 9.5
     );
     camera.position.lerp(camGoal, 1 - Math.pow(0.0008, dt));
-    camTarget.set(state.x + fx * 4, 2, state.z + fz * 4);
+    camTarget.set(state.x + fx * 3.5, 1.4, state.z + fz * 3.5);
     camera.lookAt(camTarget);
 
     // --- Animate kiosks ---
