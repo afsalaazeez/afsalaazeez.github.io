@@ -2,767 +2,233 @@
 <html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  
+
   <!-- SEO Meta Tags -->
   <title>Afsal A Azeez | Full-Stack &amp; AI Engineer | IIT Bombay M.Tech</title>
   <meta name="description" content="Portfolio of Afsal A Azeez — full-stack and AI engineer with 5+ years at a Mayfield-funded AI startup (Roost.ai). IIT Bombay M.Tech. Specializes in LLM systems, RAG pipelines, autonomous agents, and scalable web applications.">
   <meta name="keywords" content="Afsal A Azeez, Full Stack Engineer, AI Engineer, LLM, RAG, LangChain, LlamaIndex, IIT Bombay, Zettabytes, Roost.ai, Portfolio, React, Node.js, Python, FastAPI, pgvector">
   <meta name="author" content="Afsal A Azeez">
-  
-  <!-- Open Graph / Facebook -->
+
+  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Afsal A Azeez | Full-Stack &amp; AI Engineer | IIT Bombay M.Tech">
   <meta property="og:description" content="Full-stack and AI engineer with 5+ years building LLM-powered production systems. IIT Bombay M.Tech. Open to senior engineering roles in UAE.">
   <meta property="og:image" content="https://afsalaazeez.github.io/assets/portfolio-preview.jpg">
-  
-  <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Afsal A Azeez | Full-Stack &amp; AI Engineer | IIT Bombay M.Tech">
-  <meta property="twitter:description" content="Full-stack and AI engineer with 5+ years building LLM-powered production systems. IIT Bombay M.Tech. Open to senior engineering roles in UAE.">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
 
-  <!-- Core Stylesheet -->
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style-car.css">
 </head>
 <body>
 
-  <!-- ==========================================
-       NAVIGATION BAR
-       ========================================== -->
-  <nav class="navbar" id="navbar">
+  <!-- THE 3D WORLD -->
+  <canvas id="world"></canvas>
+
+  <!-- THIN CONTROL BAR -->
+  <nav class="navbar scrolled" id="navbar">
     <div class="container nav-container">
-      <a href="#home" class="logo">
-        AFSAL A AZEEZ<span class="logo-dot"></span>
-      </a>
-      
+      <a href="#" class="logo">AFSAL A AZEEZ<span class="logo-dot"></span></a>
       <ul class="nav-links" id="nav-links">
-        <li><a href="#home" class="active">Home</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#" data-kiosk="" class="active">Home</a></li>
+        <li><a href="#" data-kiosk="about">About</a></li>
+        <li><a href="#" data-kiosk="skills">Skills</a></li>
+        <li><a href="#" data-kiosk="p-rag">Projects</a></li>
+        <li><a href="#" data-kiosk="contact">Contact</a></li>
       </ul>
-
       <div class="nav-actions">
-        <!-- Theme Toggle Button -->
+        <button class="list-toggle-btn" id="list-toggle" title="View all content as a list">☰ List view</button>
         <button class="theme-toggle" id="theme-toggle" aria-label="Toggle visual theme" title="Switch Theme">
-          <svg class="sun-icon" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="5"></circle>
-            <line x1="12" y1="1" x2="12" y2="3"></line>
-            <line x1="12" y1="21" x2="12" y2="23"></line>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-            <line x1="1" y1="12" x2="3" y2="12"></line>
-            <line x1="21" y1="12" x2="23" y2="12"></line>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-          </svg>
-          <svg class="moon-icon" viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
+          <svg class="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          <svg class="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
         </button>
-
-        <!-- Hamburger Mobile Toggle -->
-        <button class="menu-btn" id="menu-btn" aria-label="Open navigation menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
+        <button class="menu-btn" id="menu-btn" aria-label="Open navigation menu"><span></span><span></span><span></span></button>
       </div>
     </div>
   </nav>
 
-  <!-- ==========================================
-       HERO SECTION
-       ========================================== -->
-  <section class="hero" id="home">
-    <!-- Interactive Canvas Particles Background -->
-    <canvas class="hero-canvas" id="hero-canvas"></canvas>
-    
-    <div class="container">
-      <div class="hero-content reveal">
-        <span class="hero-tag">
-          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00f2fe;box-shadow:0 0 8px #00f2fe;"></span>
-          Available Immediately (UAE)
-        </span>
-        <h1>
-          Building Scalable &amp; <span class="name">AI-Driven Products</span>
-        </h1>
-        <div class="hero-subtitle">
-          I'm a <span class="typing-text gradient-text" id="typing-sub">Full-Stack Developer</span>
+  <button class="btn btn-secondary" id="list-close">✕ Close list</button>
+
+  <!-- ===================================================================
+       INFO CARDS — one per kiosk (id = card-<kioskId>)
+       =================================================================== -->
+  <div id="cards">
+
+    <p class="webgl-banner">Your browser couldn't start the 3D world, so here is the full portfolio as a list.</p>
+
+    <!-- ABOUT -->
+    <article class="info-card glass" id="card-about">
+      <span class="card-kicker">About My Journey</span>
+      <h2>Afsal A Azeez</h2>
+      <p>Senior Software Engineer &amp; Systems Architect specializing in scalable distributed microservices and production-grade AI/LLM applications. Alumnus of IIT Bombay (M.Tech), AIR-241 in GATE CS, with 5+ years driving technical strategy at a venture-backed startup.</p>
+      <div class="about-stats">
+        <div class="stat-card glass"><span class="stat-num">5+</span><span class="stat-label">Years Exp</span></div>
+        <div class="stat-card glass"><span class="stat-num">AIR-241</span><span class="stat-label">GATE CS</span></div>
+        <div class="stat-card glass"><span class="stat-num">IIT</span><span class="stat-label">Bombay M.Tech</span></div>
+      </div>
+      <div class="timeline" style="margin-top:1.5rem;">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-time">2020 - 2026</span>
+          <h4 class="timeline-header">Member of Technical Staff <span>- Zettabytes (Roost.ai)</span></h4>
+          <p class="timeline-desc">Full-stack &amp; AI engineer: Kubernetes visualisation UI, Electron desktop app, a Java AST parsing service (93% compile rate), MS Teams bot, Git platform integrations, and a multi-LLM provider UI dashboard.</p>
         </div>
-        <p class="hero-desc">
-          Hi, I am <strong>Afsal A Azeez</strong>. Accomplished Systems Architect and Senior Developer specializing in designing, building, and scaling robust distributed microservices and production-grade AI/LLM applications.
-        </p>
-        
-        <div class="hero-btns">
-          <a href="#projects" class="btn btn-primary">Explore Work</a>
-          <a href="#contact" class="btn btn-secondary">Get in Touch</a>
-        </div>
-        
-        <div class="hero-socials">
-          <span>Follow Me</span>
-          <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub Profile">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-            </svg>
-          </a>
-          <a href="https://linkedin.com/in/afsalaazeez" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn Profile">
-            <svg viewBox="0 0 24 24">
-              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-            </svg>
-          </a>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <span class="timeline-time">2018 - 2020</span>
+          <h4 class="timeline-header">M.Tech CSE <span>- IIT Bombay</span></h4>
+          <p class="timeline-desc">Graduate research; TA for CS699 (Software Lab) and CS101 (Computer Programming).</p>
         </div>
       </div>
-      
-      <!-- Interactive Portrait SVG Widget -->
-      <div class="hero-graphic reveal delay-2">
-        <div class="portrait-container">
-          <div class="portrait-glow"></div>
-          <div class="portrait-mesh">
-            <!-- A high-end interactive code/architecture wireframe SVG -->
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="svg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="var(--accent-primary)" />
-                  <stop offset="100%" stop-color="var(--accent-secondary)" />
-                </linearGradient>
-              </defs>
-              <!-- Outer glowing orbit -->
-              <circle cx="50" cy="50" r="40" stroke="url(#svg-grad)" stroke-width="0.75" fill="none" stroke-dasharray="8, 4" opacity="0.6"/>
-              <!-- Structural network coordinates -->
-              <polygon points="50,15 80,35 80,65 50,85 20,65 20,35" stroke="url(#svg-grad)" stroke-width="1.5" fill="none" opacity="0.8"/>
-              <line x1="50" y1="15" x2="50" y2="85" stroke="url(#svg-grad)" stroke-width="0.5" opacity="0.4" />
-              <line x1="20" y1="35" x2="80" y2="65" stroke="url(#svg-grad)" stroke-width="0.5" opacity="0.4" />
-              <line x1="20" y1="65" x2="80" y2="35" stroke="url(#svg-grad)" stroke-width="0.5" opacity="0.4" />
-              <!-- Core nodes -->
-              <circle cx="50" cy="15" r="3" fill="var(--accent-primary)" />
-              <circle cx="80" cy="35" r="3" fill="var(--accent-secondary)" />
-              <circle cx="80" cy="65" r="3" fill="var(--accent-primary)" />
-              <circle cx="50" cy="85" r="3" fill="var(--accent-secondary)" />
-              <circle cx="20" cy="65" r="3" fill="var(--accent-primary)" />
-              <circle cx="20" cy="35" r="3" fill="var(--accent-secondary)" />
-              
-              <!-- Floating central core -->
-              <circle cx="50" cy="50" r="12" fill="url(#svg-grad)" opacity="0.15" />
-              <circle cx="50" cy="50" r="6" fill="url(#svg-grad)" />
-            </svg>
-          </div>
-          
-          <!-- Floating Badges -->
-          <div class="floating-badge badge-1 glass">
-            <div class="badge-icon">⚡</div>
-            <div class="badge-text">
-              <span>Expertise</span>
-              <strong>Full-Stack Architect</strong>
-            </div>
-          </div>
-          
-          <div class="floating-badge badge-2 glass">
-            <div class="badge-icon">🤖</div>
-            <div class="badge-text">
-              <span>Specialization</span>
-              <strong>GenAI &amp; LLMs</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </article>
 
-  <!-- ==========================================
-       ABOUT ME SECTION
-       ========================================== -->
-  <section class="section" id="about">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2>About My Journey</h2>
-        <p>A bridge between scalable backend infrastructure, system design, and production-grade AI applications.</p>
-      </div>
-
-      <div class="about-grid">
-        <div class="about-content reveal">
-          <h3>Who I Am</h3>
-          <p>
-            I am a Senior Software Engineer and Systems Architect with a profound technical background specializing in designing, building, and scaling robust distributed microservices and production-grade AI/LLM applications.
-          </p>
-          <p>
-            With a proven track record driving technical strategy at a venture-backed startup, I focus on optimizing backend APIs, designing cloud-native infrastructures (AWS/Kubernetes), and engineering multi-LLM orchestration platforms. I am an alumnus of IIT Bombay, having graduated with an M.Tech degree and secured an All India Rank of 241 in the GATE CS exam.
-          </p>
-
-          <div class="about-stats">
-            <div class="stat-card glass glass-interactive">
-              <span class="stat-num">5+</span>
-              <span class="stat-label">Years Exp</span>
-            </div>
-            <div class="stat-card glass glass-interactive">
-              <span class="stat-num">AIR-241</span>
-              <span class="stat-label">GATE CS</span>
-            </div>
-            <div class="stat-card glass glass-interactive">
-              <span class="stat-num">IIT</span>
-              <span class="stat-label">Bombay M.Tech</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="about-timeline reveal delay-2">
-          <h3 class="timeline-title">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-            Experience &amp; Education
-          </h3>
-          
-          <div class="timeline">
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <span class="timeline-time">2020 - 2026</span>
-              <h4 class="timeline-header">Member of Technical Staff <span>- Zettabytes Inc. (Roost.ai)</span></h4>
-              <p class="timeline-desc">Full-stack &amp; AI engineer across two product phases. <strong>EaaS (2020–2022):</strong> Kubernetes visualisation UI, Electron.js desktop app, serverless migration to AWS Lambda. <strong>RoostGPT (2023–2026):</strong> Java AST parsing service (93% compile rate, 316KB→17KB schema reduction), MS Teams notification bot, Git platform integrations (GitHub, GitLab, Bitbucket, Azure Repos), multi-LLM provider UI dashboard.</p>
-            </div>
-
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <span class="timeline-time">2018 - 2020</span>
-              <h4 class="timeline-header">M.Tech. in Computer Science &amp; Engineering <span>- IIT Bombay</span></h4>
-              <p class="timeline-desc">Completed graduate research and studies at Indian Institute of Technology, Bombay. Served as Graduate Teaching Assistant for CS699 (Software Lab) and CS101 (Computer Programming).</p>
-            </div>
-
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <span class="timeline-time">Jan 2017 - Feb 2017</span>
-              <h4 class="timeline-header">Software Engineering Intern <span>- Zoho Corporation</span></h4>
-              <p class="timeline-desc">Collaborated on core Java-based backend services, designing and optimizing database queries for curriculum project modules.</p>
-            </div>
-
-            <div class="timeline-item">
-              <div class="timeline-dot"></div>
-              <span class="timeline-time">2013 - 2017</span>
-              <h4 class="timeline-header">B.Tech. in Computer Science &amp; Engineering <span>- MACE</span></h4>
-              <p class="timeline-desc">Acquired engineering core at Mar Athanasius College of Engineering. Represented the institute at GDG Android and Mozilla workshops.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================
-       SKILLS SECTION
-       ========================================== -->
-  <section class="section" id="skills" style="background-color: var(--bg-secondary);">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2>Professional Stack</h2>
-        <p>A collection of languages, frameworks, and engineering systems I employ to bring ideas to life.</p>
-      </div>
-
+    <!-- SKILLS -->
+    <article class="info-card glass" id="card-skills">
+      <span class="card-kicker">Professional Stack</span>
+      <h2>Skills</h2>
       <div class="skills-grid">
-        <!-- Full-Stack & UI Architecture -->
-        <div class="skills-category glass reveal">
-          <h3>
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-            </svg>
-            Full-Stack &amp; UI Architecture
-          </h3>
+        <div class="skills-category">
+          <h3>Full-Stack &amp; UI</h3>
           <div class="skills-list">
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">React, Next.js &amp; State (Zustand, Redux)</span><span class="skill-pct">95%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="95"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Node.js (TypeScript) &amp; Express/Fastify</span><span class="skill-pct">92%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="92"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Responsive Design (HTML5/CSS3, Tailwind)</span><span class="skill-pct">90%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="90"></div></div>
-            </div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">React, Next.js &amp; State</span><span class="skill-pct">95%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:95%"></div></div></div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">Node.js (TS) &amp; Express/Fastify</span><span class="skill-pct">92%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:92%"></div></div></div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">HTML5/CSS3, Tailwind</span><span class="skill-pct">90%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:90%"></div></div></div>
           </div>
         </div>
-
-        <!-- Backend, Databases & Caching -->
-        <div class="skills-category glass reveal delay-1">
-          <h3>
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M5 12a2 2 0 012-2h10a2 2 0 012 2m-14 0a2 2 0 002 2h10a2 2 0 002-2M7 8h10M7 16h10"></path>
-            </svg>
-            Backend, Databases &amp; Caching
-          </h3>
+        <div class="skills-category">
+          <h3>Backend &amp; Data</h3>
           <div class="skills-list">
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Python (FastAPI, Django) &amp; Go</span><span class="skill-pct">90%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="90"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">PostgreSQL, MySQL, MongoDB</span><span class="skill-pct">88%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="88"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Redis (Cache/PubSub) &amp; Elasticsearch</span><span class="skill-pct">85%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="85"></div></div>
-            </div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">Python (FastAPI, Django) &amp; Go</span><span class="skill-pct">90%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:90%"></div></div></div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">PostgreSQL, MySQL, MongoDB</span><span class="skill-pct">88%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:88%"></div></div></div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">Redis &amp; Elasticsearch</span><span class="skill-pct">85%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%"></div></div></div>
           </div>
         </div>
-
-        <!-- Cloud, DevOps & AI Agents -->
-        <div class="skills-category glass reveal delay-2">
-          <h3>
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
-            </svg>
-            Cloud, DevOps &amp; AI Agents
-          </h3>
+        <div class="skills-category">
+          <h3>Cloud &amp; AI Agents</h3>
           <div class="skills-list">
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">AWS Services &amp; Kubernetes (EKS)</span><span class="skill-pct">85%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="85"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">Infrastructure as Code (Terraform)</span><span class="skill-pct">80%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="80"></div></div>
-            </div>
-            <div class="skill-item">
-              <div class="skill-info"><span class="skill-name">GenAI, AI Agents &amp; LangChain</span><span class="skill-pct">92%</span></div>
-              <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="92"></div></div>
-            </div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">AWS &amp; Kubernetes (EKS)</span><span class="skill-pct">85%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:85%"></div></div></div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">Terraform (IaC)</span><span class="skill-pct">80%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:80%"></div></div></div>
+            <div class="skill-item"><div class="skill-info"><span class="skill-name">GenAI, Agents &amp; LangChain</span><span class="skill-pct">92%</span></div><div class="skill-bar-bg"><div class="skill-bar-fill" style="width:92%"></div></div></div>
           </div>
         </div>
       </div>
+    </article>
+
+    <!-- PROJECT: GovShield -->
+    <article class="info-card glass" id="card-p-rag">
+      <span class="card-kicker">Project · Secure RAG</span>
+      <h2>GovShield — Offline RAG Portal</h2>
+      <div class="project-tags"><span class="project-tag">LlamaIndex</span><span class="project-tag">pgvector</span><span class="project-tag">FastAPI</span><span class="project-tag">RBAC</span></div>
+      <p>100% offline RAG system with RBAC pre-filtering at the vector store layer — access control enforced before retrieval, not after. LlamaIndex + Ollama + PostgreSQL pgvector + FastAPI REST API. Dockerized two-service deployment.</p>
+      <a href="https://github.com/zencodelab/raglearn" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View on GitHub →</a>
+    </article>
+
+    <!-- PROJECT: TaskEngine -->
+    <article class="info-card glass" id="card-p-agent">
+      <span class="card-kicker">Project · Autonomous Agent</span>
+      <h2>TaskEngine — Autonomous Agent</h2>
+      <div class="project-tags"><span class="project-tag">LangChain</span><span class="project-tag">LangGraph</span><span class="project-tag">Pinecone</span><span class="project-tag">FastAPI</span></div>
+      <p>Plan→Execute→Reflect loop: a LangChain planner decomposes queries into atomic steps, a LangGraph ReAct executor runs each with tools (web search, code execution, file I/O), and a reflector scores quality and re-plans on failure. Pinecone stores past runs as few-shot context.</p>
+      <a href="https://github.com/zencodelab/aiautonomous" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View on GitHub →</a>
+    </article>
+
+    <!-- PROJECT: VisionLog -->
+    <article class="info-card glass" id="card-p-vision">
+      <span class="card-kicker">Project · Vision AI</span>
+      <h2>VisionLog-MLX</h2>
+      <div class="project-tags"><span class="project-tag">Python</span><span class="project-tag">OpenCV</span><span class="project-tag">Ollama</span><span class="project-tag">Apple Silicon</span></div>
+      <p>On-device vision logger using OpenCV for motion detection, dlib for face recognition, and Ollama Gemma for real-time scene description. Fully offline on Apple Silicon via Metal acceleration.</p>
+      <a href="https://github.com/zencodelab/MehvishLog" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View on GitHub →</a>
+    </article>
+
+    <!-- PROJECT: GIS -->
+    <article class="info-card glass" id="card-p-gis">
+      <span class="card-kicker">Project · GIS Database</span>
+      <h2>GIS Water Network DB</h2>
+      <div class="project-tags"><span class="project-tag">Python</span><span class="project-tag">SQL</span><span class="project-tag">QGIS</span><span class="project-tag">EPANET</span></div>
+      <p>A GIS-integrated water network database application in QGIS using Python and SQL. Automates node elevation extraction and workflows for EPANET and JalTantra.</p>
+      <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View on GitHub →</a>
+    </article>
+
+    <!-- PROJECT: Chat -->
+    <article class="info-card glass" id="card-p-chat">
+      <span class="card-kicker">Project · Real-Time Web</span>
+      <h2>Real-Time Messaging Platform</h2>
+      <div class="project-tags"><span class="project-tag">Flask</span><span class="project-tag">Socket.IO</span><span class="project-tag">Elasticsearch</span></div>
+      <p>A Flask-based real-time coordination and workspace system using Socket.IO for bi-directional messaging and Elasticsearch for fast query indexing.</p>
+      <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View on GitHub →</a>
+    </article>
+
+    <!-- PROJECT: Flight -->
+    <article class="info-card glass" id="card-p-flight">
+      <span class="card-kicker">Project · Predictive ML</span>
+      <h2>Flight Delay Predictor</h2>
+      <div class="project-tags"><span class="project-tag">Python</span><span class="project-tag">XGBoost</span><span class="project-tag">SMOTE</span></div>
+      <p>A binary classification engine using Python and XGBoost to predict delays exceeding 15 minutes, solving heavy class imbalance with SMOTE.</p>
+      <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="btn btn-primary">View on GitHub →</a>
+    </article>
+
+    <!-- CONTACT -->
+    <article class="info-card glass" id="card-contact">
+      <span class="card-kicker">Get In Touch</span>
+      <h2>Contact</h2>
+      <p>Open to Senior Full-Stack &amp; Systems Architect or AI/LLM roles. Based in Abu Dhabi, UAE (willing to relocate).</p>
+      <div class="contact-card glass">
+        <div class="contact-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></div>
+        <div class="contact-details"><span>Email</span><strong><a href="mailto:afsalaazeez@gmail.com">afsalaazeez@gmail.com</a></strong></div>
+      </div>
+      <div class="contact-card glass">
+        <div class="contact-icon"><svg fill="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></div>
+        <div class="contact-details"><span>LinkedIn</span><strong><a href="https://linkedin.com/in/afsalaazeez" target="_blank" rel="noopener noreferrer">linkedin.com/in/afsalaazeez</a></strong></div>
+      </div>
+      <form class="contact-form" id="portfolio-contact-form" novalidate style="padding:0;margin-top:1rem;">
+        <div class="form-grid">
+          <div class="form-group form-group-full"><label for="form-name">Full Name</label><div class="form-input-wrapper"><input type="text" id="form-name" name="name" class="form-input" placeholder="Your name" required></div></div>
+          <div class="form-group form-group-full"><label for="form-email">Email</label><div class="form-input-wrapper"><input type="email" id="form-email" name="email" class="form-input" placeholder="email@domain.com" required></div></div>
+          <div class="form-group form-group-full"><label for="form-subject">Subject</label><div class="form-input-wrapper"><input type="text" id="form-subject" name="subject" class="form-input" placeholder="Collaboration proposal" required></div></div>
+          <div class="form-group form-group-full"><label for="form-message">Message</label><div class="form-input-wrapper"><textarea id="form-message" name="message" class="form-input" placeholder="Hi Afsal..." required></textarea></div></div>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem;">Transmit Message</button>
+        <div id="form-status" class="form-status"></div>
+      </form>
+    </article>
+
+  </div>
+
+  <!-- HELP / START OVERLAY -->
+  <div id="help-overlay">
+    <div class="help-card">
+      <span class="hero-tag"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#00f2fe;box-shadow:0 0 8px #00f2fe;"></span>Available Immediately (UAE)</span>
+      <h1>Drive through my <span class="name">portfolio</span></h1>
+      <div class="hero-subtitle">I'm a <span class="typing-text gradient-text" id="typing-sub">Full-Stack Developer</span></div>
+      <p>Steer the car around the plaza and roll up to any glowing kiosk to read about my experience, skills and projects.</p>
+      <div class="help-keys"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span style="color:var(--text-muted);align-self:center;">or</span><kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd></div>
+      <button class="btn btn-primary" id="help-start">Start driving</button>
     </div>
-  </section>
+  </div>
 
-  <!-- ==========================================
-       PROJECTS SECTION
-       ========================================== -->
-  <section class="section" id="projects">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2>Selected Creations</h2>
-        <p>A curation of applications built focusing on design responsiveness, architectural cleanliness, and premium user interaction.</p>
-      </div>
+  <!-- PERSISTENT HINT + TOUCH CONTROLS -->
+  <div class="controls-hint">WASD / Arrow keys to drive · approach a kiosk</div>
+  <div class="touch-controls" aria-label="Driving controls">
+    <button id="btn-up" aria-label="Accelerate">▲</button>
+    <button id="btn-left" aria-label="Steer left">◀</button>
+    <button id="btn-down" aria-label="Reverse">▼</button>
+    <button id="btn-right" aria-label="Steer right">▶</button>
+  </div>
 
-      <!-- Filter Controls -->
-      <div class="portfolio-filters reveal delay-1">
-        <button class="filter-btn active" data-filter="all">All Projects</button>
-        <button class="filter-btn" data-filter="ai">AI &amp; GenAI</button>
-        <button class="filter-btn" data-filter="web">Web Apps</button>
-        <button class="filter-btn" data-filter="systems">Systems &amp; DB</button>
-      </div>
-
-      <!-- Projects Grid -->
-      <div class="projects-grid">
-
-        <!-- GovShield — Offline RAG Portal (AI / GenAI) -->
-        <div class="project-card-wrapper reveal" data-category="ai">
-          <article class="project-card glass glass-interactive">
-            <div class="project-img-wrapper">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="svg-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="var(--accent-primary)" />
-                    <stop offset="100%" stop-color="var(--accent-secondary)" />
-                  </linearGradient>
-                </defs>
-                <!-- Shield outline -->
-                <path d="M50 8 L82 22 L82 54 Q82 76 50 92 Q18 76 18 54 L18 22 Z" fill="none" stroke="var(--accent-primary)" stroke-width="2" opacity="0.85"/>
-                <!-- pgvector DB cylinder -->
-                <ellipse cx="50" cy="38" rx="14" ry="4" fill="none" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-                <line x1="36" y1="38" x2="36" y2="51" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-                <line x1="64" y1="38" x2="64" y2="51" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-                <ellipse cx="50" cy="51" rx="14" ry="4" fill="none" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-                <!-- Lock body -->
-                <rect x="44" y="60" width="12" height="10" rx="2" fill="url(#svg-grad2)" opacity="0.75"/>
-                <!-- Lock shackle -->
-                <path d="M46 60 Q46 54 50 54 Q54 54 54 60" fill="none" stroke="var(--accent-primary)" stroke-width="1.5"/>
-              </svg>
-              <div class="project-img-overlay">
-                <span class="project-tag">Secure RAG</span>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-tags">
-                <span class="project-tag">LlamaIndex</span>
-                <span class="project-tag">pgvector</span>
-                <span class="project-tag">FastAPI</span>
-                <span class="project-tag">RBAC</span>
-              </div>
-              <h3 class="project-title">GovShield — Offline RAG Portal</h3>
-              <p class="project-desc">100% offline RAG system with RBAC pre-filtering at the vector store layer — access control enforced before retrieval, not after. LlamaIndex + Ollama + PostgreSQL pgvector + FastAPI REST API. Dockerized two-service deployment.</p>
-              <div class="project-links">
-                <a href="https://github.com/zencodelab/raglearn" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <!-- TaskEngine — Autonomous Agent (AI / GenAI) -->
-        <div class="project-card-wrapper reveal delay-1" data-category="ai">
-          <article class="project-card glass glass-interactive">
-            <div class="project-img-wrapper">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Plan box -->
-                <rect x="10" y="12" width="28" height="15" rx="3" fill="none" stroke="var(--accent-primary)" stroke-width="1.8"/>
-                <!-- Execute box -->
-                <rect x="36" y="43" width="28" height="15" rx="3" fill="none" stroke="var(--accent-secondary)" stroke-width="1.8"/>
-                <!-- Reflect box -->
-                <rect x="10" y="73" width="28" height="15" rx="3" fill="none" stroke="var(--accent-primary)" stroke-width="1.8"/>
-                <!-- Plan → Execute -->
-                <path d="M38 22 Q50 22 50 43" fill="none" stroke="url(#svg-grad)" stroke-width="1.5"/>
-                <circle cx="50" cy="43" r="2.5" fill="var(--accent-secondary)"/>
-                <!-- Execute → Reflect -->
-                <path d="M50 58 Q50 80 38 80" fill="none" stroke="url(#svg-grad)" stroke-width="1.5"/>
-                <circle cx="38" cy="80" r="2.5" fill="var(--accent-primary)"/>
-                <!-- Re-plan loop -->
-                <path d="M10 80 Q-2 50 10 20" fill="none" stroke="var(--accent-primary)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.55"/>
-                <circle cx="10" cy="20" r="2" fill="var(--accent-primary)" opacity="0.55"/>
-                <!-- Pinecone knowledge store -->
-                <circle cx="79" cy="50" r="14" fill="none" stroke="var(--accent-secondary)" stroke-width="1.2" stroke-dasharray="3,2" opacity="0.5"/>
-                <circle cx="79" cy="50" r="5" fill="var(--accent-secondary)" opacity="0.55"/>
-                <line x1="64" y1="50" x2="73" y2="50" stroke="var(--accent-secondary)" stroke-width="1.2" opacity="0.7"/>
-              </svg>
-              <div class="project-img-overlay">
-                <span class="project-tag">Autonomous Agent</span>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-tags">
-                <span class="project-tag">LangChain</span>
-                <span class="project-tag">LangGraph</span>
-                <span class="project-tag">Pinecone</span>
-                <span class="project-tag">FastAPI</span>
-              </div>
-              <h3 class="project-title">TaskEngine — Autonomous Agent</h3>
-              <p class="project-desc">Plan→Execute→Reflect loop: LangChain planner decomposes queries into atomic steps; LangGraph ReAct executor runs each with tools (web search, code execution, file I/O); reflector scores quality and re-plans on failure. Pinecone stores past runs as few-shot planner context.</p>
-              <div class="project-links">
-                <a href="https://github.com/zencodelab/aiautonomous" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <!-- Project 1 (AI / GenAI) -->
-        <div class="project-card-wrapper reveal" data-category="ai">
-          <article class="project-card glass glass-interactive">
-            <div class="project-img-wrapper">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Outer camera frame/scanner -->
-                <circle cx="50" cy="50" r="30" fill="none" stroke="var(--accent-primary)" stroke-width="2"/>
-                <circle cx="50" cy="50" r="15" fill="none" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-                <circle cx="50" cy="50" r="6" fill="var(--accent-primary)"/>
-                <!-- Reticle/Scan marks -->
-                <path d="M 25,50 L 15,50 M 75,50 L 85,50 M 50,25 L 50,15 M 50,75 L 50,85" stroke="var(--accent-primary)" stroke-width="1.5"/>
-                <!-- Scanning laser line -->
-                <line x1="10" y1="30" x2="90" y2="30" stroke="var(--accent-secondary)" stroke-width="1" opacity="0.6"/>
-              </svg>
-              <div class="project-img-overlay">
-                <span class="project-tag">Vision AI</span>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-tags">
-                <span class="project-tag">Python</span>
-                <span class="project-tag">OpenCV</span>
-                <span class="project-tag">Ollama</span>
-                <span class="project-tag">Apple Silicon</span>
-              </div>
-              <h3 class="project-title">VisionLog-MLX</h3>
-              <p class="project-desc">On-device vision logger using OpenCV for motion detection, dlib for face recognition, and Ollama Gemma 4 12B for real-time scene description. Fully offline on Apple Silicon via Metal acceleration.</p>
-              <div class="project-links">
-                <a href="https://github.com/zencodelab/MehvishLog" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <!-- Project 2 (Systems & DB) -->
-        <div class="project-card-wrapper reveal delay-1" data-category="systems">
-          <article class="project-card glass glass-interactive">
-            <div class="project-img-wrapper">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Map Grid backdrop -->
-                <path d="M 10,10 L 90,10 M 10,30 L 90,30 M 10,50 L 90,50 M 10,70 L 90,70 M 10,90 L 90,90" stroke="var(--card-border)" stroke-width="0.5"/>
-                <path d="M 10,10 L 10,90 M 30,10 L 30,90 M 50,10 L 50,90 M 70,10 L 70,90 M 90,10 L 90,90" stroke="var(--card-border)" stroke-width="0.5"/>
-                <!-- Network nodes & pipelines -->
-                <path d="M 30,30 L 50,55 L 70,35 L 75,70 L 45,75 L 30,30" fill="none" stroke="url(#svg-grad)" stroke-width="2.5" stroke-linejoin="round"/>
-                <circle cx="30" cy="30" r="4" fill="var(--accent-primary)"/>
-                <circle cx="50" cy="55" r="5" fill="var(--accent-secondary)"/>
-                <circle cx="70" cy="35" r="4" fill="var(--accent-primary)"/>
-                <circle cx="75" cy="70" r="4" fill="var(--accent-secondary)"/>
-                <circle cx="45" cy="75" r="4" fill="var(--accent-primary)"/>
-              </svg>
-              <div class="project-img-overlay">
-                <span class="project-tag">GIS Database</span>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-tags">
-                <span class="project-tag">Python</span>
-                <span class="project-tag">SQL</span>
-                <span class="project-tag">QGIS</span>
-                <span class="project-tag">EPANET</span>
-              </div>
-              <h3 class="project-title">GIS Water Network DB</h3>
-              <p class="project-desc">Designed a GIS-integrated water network database application in QGIS using Python and SQL. Automates node elevation extraction and workflows for EPANET and JalTantra.</p>
-              <div class="project-links">
-                <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <!-- Project 3 (Web Apps) -->
-        <div class="project-card-wrapper reveal delay-2" data-category="web">
-          <article class="project-card glass glass-interactive">
-            <div class="project-img-wrapper">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Chat Bubbles -->
-                <rect x="15" y="20" width="50" height="25" rx="5" fill="none" stroke="var(--accent-primary)" stroke-width="2"/>
-                <path d="M 20,45 L 20,53 L 30,45" fill="none" stroke="var(--accent-primary)" stroke-width="2"/>
-                <rect x="35" y="55" width="50" height="25" rx="5" fill="none" stroke="var(--accent-secondary)" stroke-width="2"/>
-                <path d="M 80,80 L 80,88 L 70,80" fill="none" stroke="var(--accent-secondary)" stroke-width="2"/>
-                <!-- Typing lines -->
-                <line x1="25" y1="28" x2="55" y2="28" stroke="var(--accent-primary)" stroke-width="1.5"/>
-                <line x1="25" y1="36" x2="45" y2="36" stroke="var(--accent-primary)" stroke-width="1.5"/>
-                <line x1="45" y1="63" x2="75" y2="63" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-                <line x1="45" y1="71" x2="65" y2="71" stroke="var(--accent-secondary)" stroke-width="1.5"/>
-              </svg>
-              <div class="project-img-overlay">
-                <span class="project-tag">Real-Time Chat</span>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-tags">
-                <span class="project-tag">Flask</span>
-                <span class="project-tag">Socket.IO</span>
-                <span class="project-tag">Elasticsearch</span>
-              </div>
-              <h3 class="project-title">Real-Time Messaging Platform</h3>
-              <p class="project-desc">Architected a Flask-based real-time coordination and workspace system using Socket.IO for bi-directional messaging and Elasticsearch for lightning-fast query indexing.</p>
-              <div class="project-links">
-                <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <!-- Project 4 (AI / GenAI) -->
-        <div class="project-card-wrapper reveal" data-category="ai">
-          <article class="project-card glass glass-interactive">
-            <div class="project-img-wrapper">
-              <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <!-- Bar telemetry charts -->
-                <rect x="20" y="70" width="10" height="15" fill="var(--accent-primary)" opacity="0.4"/>
-                <rect x="35" y="55" width="10" height="30" fill="var(--accent-primary)" opacity="0.6"/>
-                <rect x="50" y="40" width="10" height="45" fill="var(--accent-secondary)" opacity="0.5"/>
-                <rect x="65" y="25" width="10" height="60" fill="var(--accent-secondary)" opacity="0.8"/>
-                <!-- Upward trend projection line -->
-                <path d="M 15,80 L 35,65 L 50,45 L 75,20" fill="none" stroke="url(#svg-grad)" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="75" cy="20" r="3" fill="var(--accent-primary)"/>
-              </svg>
-              <div class="project-img-overlay">
-                <span class="project-tag">Predictive ML</span>
-              </div>
-            </div>
-            <div class="project-body">
-              <div class="project-tags">
-                <span class="project-tag">Python</span>
-                <span class="project-tag">XGBoost</span>
-                <span class="project-tag">SMOTE</span>
-              </div>
-              <h3 class="project-title">Flight Delay Predictor</h3>
-              <p class="project-desc">A binary classification engine using Python and XGBoost to predict delays exceeding 15 minutes. Solved heavy class imbalance with SMOTE techniques.</p>
-              <div class="project-links">
-                <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" class="project-link">
-                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  GitHub
-                </a>
-              </div>
-            </div>
-          </article>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================
-       CONTACT HUB
-       ========================================== -->
-  <section class="section" id="contact" style="background-color: var(--bg-secondary);">
-    <div class="container">
-      <div class="section-header reveal">
-        <h2>Get In Touch</h2>
-        <p>Let's discuss your next project, collaboration prospects, or professional opportunities.</p>
-      </div>
-
-      <div class="contact-grid">
-        <div class="contact-info reveal">
-          <div class="contact-heading">
-            <h3>Let's create something stellar</h3>
-            <p>I am open to Senior Full-Stack Developer &amp; Systems Architect opportunities or AI/LLM integration roles. Based in Abu Dhabi, UAE (willing to relocate). Feel free to reach out via direct channels or drop a message here.</p>
-          </div>
-
-          <div class="contact-methods">
-            <!-- Mail -->
-            <div class="contact-card glass">
-              <div class="contact-icon">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <div class="contact-details">
-                <span>Email Direct</span>
-                <strong><a href="mailto:afsalaazeez@gmail.com">afsalaazeez@gmail.com</a></strong>
-              </div>
-            </div>
-
-            <!-- Phone Call -->
-            <div class="contact-card glass">
-              <div class="contact-icon">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                </svg>
-              </div>
-              <div class="contact-details">
-                <span>Phone Call</span>
-                <strong><a href="tel:+971553885320">+971 55 388 5320</a></strong>
-              </div>
-            </div>
-
-            <!-- WhatsApp Direct -->
-            <div class="contact-card glass">
-              <div class="contact-icon">
-                <svg fill="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;">
-                  <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.729-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.97C16.488 1.966 14.022 1.01 11.999 1.01c-5.441 0-9.866 4.372-9.87 9.802 0 1.693.447 3.348 1.3 4.825l-.997 3.637 3.725-.978zm11.367-7.234c-.29-.144-1.713-.844-1.977-.94-.264-.096-.456-.144-.647.144-.19.287-.738.94-.904 1.13-.167.19-.332.215-.622.071-.29-.145-1.222-.45-2.327-1.432-.86-.765-1.44-1.71-1.609-2.0-.168-.29-.018-.446.126-.59.13-.13.29-.338.435-.507.145-.17.193-.287.29-.481.097-.193.048-.362-.024-.507-.072-.144-.647-1.56-.887-2.136-.233-.565-.47-.489-.648-.498-.168-.008-.36-.01-.553-.01s-.507.072-.771.362c-.264.29-1.009.986-1.009 2.404 0 1.418 1.033 2.79 1.177 2.985.145.195 2.033 3.103 4.925 4.35.688.297 1.225.474 1.643.606.692.22 1.322.188 1.82.114.555-.083 1.713-.698 1.953-1.373.24-.675.24-1.253.168-1.373-.072-.12-.264-.193-.554-.338z"/>
-                </svg>
-              </div>
-              <div class="contact-details">
-                <span>WhatsApp Only</span>
-                <strong><a href="https://wa.me/918089818656" target="_blank" rel="noopener noreferrer">+91 808 981 8656</a></strong>
-              </div>
-            </div>
-
-            <!-- LinkedIn Profile -->
-            <div class="contact-card glass">
-              <div class="contact-icon">
-                <svg fill="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.779-1.75-1.75s.784-1.75 1.75-1.75 1.75.779 1.75 1.75-.784 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
-              </div>
-              <div class="contact-details">
-                <span>LinkedIn Profile</span>
-                <strong><a href="https://linkedin.com/in/afsalaazeez" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">linkedin.com/in/afsalaazeez</a></strong>
-              </div>
-            </div>
-
-            <!-- Github Profile -->
-            <div class="contact-card glass">
-              <div class="contact-icon">
-                <svg fill="currentColor" viewBox="0 0 24 24" style="width:20px;height:20px;">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-              </div>
-              <div class="contact-details">
-                <span>Github Profile</span>
-                <strong><a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" style="text-decoration:underline;">github.com/afsalaazeez</a></strong>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Contact Submission Form -->
-        <div class="contact-form-wrapper reveal delay-2">
-          <form class="contact-form glass" id="portfolio-contact-form" novalidate>
-            <div class="form-grid">
-              <div class="form-group">
-                <label for="form-name">Full Name</label>
-                <div class="form-input-wrapper">
-                  <input type="text" id="form-name" name="name" class="form-input" placeholder="Afsal A Azeez" required>
-                </div>
-              </div>
-              
-              <div class="form-group">
-                <label for="form-email">Email Address</label>
-                <div class="form-input-wrapper">
-                  <input type="email" id="form-email" name="email" class="form-input" placeholder="email@domain.com" required>
-                </div>
-              </div>
-
-              <div class="form-group form-group-full">
-                <label for="form-subject">Subject</label>
-                <div class="form-input-wrapper">
-                  <input type="text" id="form-subject" name="subject" class="form-input" placeholder="Project Collaboration Proposal" required>
-                </div>
-              </div>
-
-              <div class="form-group form-group-full">
-                <label for="form-message">Message Details</label>
-                <div class="form-input-wrapper">
-                  <textarea id="form-message" name="message" class="form-input" placeholder="Hi Afsal, I would love to talk about building a secure platform..." required></textarea>
-                </div>
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary" style="width: 100%;">Transmit Message</button>
-            <div id="form-status" class="form-status"></div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================
-       FOOTER
-       ========================================== -->
-  <footer class="footer">
-    <div class="container footer-container">
-      <div class="footer-text">
-        &copy; <span id="footer-year">2026</span> Afsal A Azeez. Built with precision using Vanilla Web Technologies.
-      </div>
-      <div class="footer-links">
-        <a href="#home">Home</a>
-        <a href="#about">About</a>
-        <a href="#skills">Skills</a>
-        <a href="#projects">Projects</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ==========================================
-       BACK TO TOP & FLOATING CONTROLS
-       ========================================== -->
-  <button class="back-to-top btn-primary" id="back-to-top" aria-label="Scroll back to top" title="Scroll to Top">
-    <svg viewBox="0 0 24 24">
-      <polyline points="18 15 12 9 6 15"></polyline>
-    </svg>
-  </button>
-
-  <!-- Script Initialization -->
-  <script src="app.js"></script>
-  <script>
-    // Quick script to dynamically display current year in footer
-    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  <!-- SCRIPTS -->
+  <script src="app-car.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
   </script>
+  <script type="module" src="scene-car.js"></script>
 </body>
 </html>
