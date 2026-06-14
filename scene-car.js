@@ -268,49 +268,102 @@ import * as THREE from 'three';
   // ========================================================================
   // CAR
   // ========================================================================
+  // Detailed low-poly roadster. Front of the car points toward +Z.
   const car = new THREE.Group();
 
   const bodyMat = new THREE.MeshStandardMaterial({
-    color: 0x00f2fe, metalness: 0.6, roughness: 0.3,
-    emissive: 0x00343a, emissiveIntensity: 0.5,
+    color: 0x00f2fe, metalness: 0.7, roughness: 0.25,
+    emissive: 0x00343a, emissiveIntensity: 0.35,
   });
-  const cabinMat = new THREE.MeshStandardMaterial({
-    color: 0x7f00ff, metalness: 0.5, roughness: 0.3,
-    emissive: 0x2a0a4a, emissiveIntensity: 0.5,
+  const accentMat = new THREE.MeshStandardMaterial({
+    color: 0x7f00ff, metalness: 0.6, roughness: 0.3,
+    emissive: 0x2a0a4a, emissiveIntensity: 0.4,
   });
-  const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0b0e16, roughness: 0.8 });
-
-  const chassis = new THREE.Mesh(new THREE.BoxGeometry(2, 0.7, 3.6), bodyMat);
-  chassis.position.y = 0.85;
-  chassis.castShadow = true;
-  car.add(chassis);
-
-  const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.7, 1.7), cabinMat);
-  cabin.position.set(0, 1.45, -0.2);
-  cabin.castShadow = true;
-  car.add(cabin);
-
-  // Headlight glow strip (front = +Z)
-  const headlight = new THREE.Mesh(
-    new THREE.BoxGeometry(1.6, 0.16, 0.1),
-    new THREE.MeshBasicMaterial({ color: 0xeaffff })
-  );
-  headlight.position.set(0, 0.85, 1.85);
-  car.add(headlight);
-
-  const wheels = [];
-  const wheelGeo = new THREE.CylinderGeometry(0.5, 0.5, 0.4, 16);
-  [
-    [-1.05, 0.5, 1.15], [1.05, 0.5, 1.15],
-    [-1.05, 0.5, -1.15], [1.05, 0.5, -1.15],
-  ].forEach((p) => {
-    const w = new THREE.Mesh(wheelGeo, wheelMat);
-    w.rotation.z = Math.PI / 2;
-    w.position.set(p[0], p[1], p[2]);
-    w.castShadow = true;
-    car.add(w);
-    wheels.push(w);
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0x0b0e16, metalness: 0.5, roughness: 0.6 });
+  const glassMat = new THREE.MeshStandardMaterial({
+    color: 0x081018, metalness: 0.4, roughness: 0.1,
+    transparent: true, opacity: 0.55,
   });
+  const tireMat = new THREE.MeshStandardMaterial({ color: 0x0b0e16, roughness: 0.85, metalness: 0.1 });
+  const rimMat = new THREE.MeshStandardMaterial({
+    color: 0x00f2fe, metalness: 0.9, roughness: 0.2,
+    emissive: 0x00343a, emissiveIntensity: 0.4,
+  });
+
+  // Helper: add a box/sphere part to the car
+  function addPart(geo, mat, x, y, z, opts = {}) {
+    const m = new THREE.Mesh(geo, mat);
+    m.position.set(x, y, z);
+    m.castShadow = opts.cast !== false;
+    car.add(m);
+    return m;
+  }
+
+  // Body: low slung base + raised hood and rear deck
+  addPart(new THREE.BoxGeometry(2, 0.5, 3.5), bodyMat, 0, 0.62, 0);
+  addPart(new THREE.BoxGeometry(1.8, 0.34, 1.7), bodyMat, 0, 0.94, 0.75);   // hood
+  addPart(new THREE.BoxGeometry(1.8, 0.34, 1.0), bodyMat, 0, 0.94, -1.05);  // rear deck
+  addPart(new THREE.BoxGeometry(2.06, 0.14, 3.0), accentMat, 0, 0.5, 0);    // side skirt
+
+  // Glass cabin + coloured roof + roof light bar
+  addPart(new THREE.BoxGeometry(1.42, 0.52, 1.5), glassMat, 0, 1.26, -0.1);
+  addPart(new THREE.BoxGeometry(1.5, 0.12, 1.55), accentMat, 0, 1.56, -0.1); // roof
+  addPart(new THREE.BoxGeometry(1.05, 0.07, 0.14),
+    new THREE.MeshBasicMaterial({ color: 0x00f2fe }), 0, 1.63, 0.45, { cast: false }); // light bar
+
+  // Bumpers
+  addPart(new THREE.BoxGeometry(1.85, 0.24, 0.2), trimMat, 0, 0.5, 1.72);
+  addPart(new THREE.BoxGeometry(1.85, 0.24, 0.2), trimMat, 0, 0.5, -1.72);
+
+  // Headlights (front, +Z) and taillights (rear, -Z)
+  const hlMat = new THREE.MeshBasicMaterial({ color: 0xeaffff });
+  addPart(new THREE.SphereGeometry(0.14, 12, 12), hlMat, 0.62, 0.72, 1.74, { cast: false });
+  addPart(new THREE.SphereGeometry(0.14, 12, 12), hlMat, -0.62, 0.72, 1.74, { cast: false });
+  const tlMat = new THREE.MeshBasicMaterial({ color: 0xff2d55 });
+  addPart(new THREE.BoxGeometry(0.5, 0.12, 0.06), tlMat, 0.55, 0.78, -1.74, { cast: false });
+  addPart(new THREE.BoxGeometry(0.5, 0.12, 0.06), tlMat, -0.55, 0.78, -1.74, { cast: false });
+
+  // Rear spoiler
+  addPart(new THREE.BoxGeometry(0.08, 0.32, 0.1), trimMat, 0.55, 1.05, -1.5);
+  addPart(new THREE.BoxGeometry(0.08, 0.32, 0.1), trimMat, -0.55, 1.05, -1.5);
+  addPart(new THREE.BoxGeometry(1.4, 0.08, 0.42), accentMat, 0, 1.22, -1.55);
+
+  // Underglow
+  const underglow = new THREE.PointLight(0x00f2fe, 6, 7);
+  underglow.position.set(0, 0.25, 0);
+  car.add(underglow);
+
+  // Wheels: rolling on all four, steering on the front pair
+  const wheels = [];       // inner pivots that roll (rotation.x)
+  const steerWheels = [];  // front outer pivots that steer (rotation.y)
+
+  function makeWheel(x, z, steerable) {
+    const outer = new THREE.Group();
+    outer.position.set(x, 0.55, z);
+    const inner = new THREE.Group();
+    outer.add(inner);
+
+    const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.42, 20), tireMat);
+    tire.rotation.z = Math.PI / 2;
+    tire.castShadow = true;
+    inner.add(tire);
+
+    const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.44, 14), rimMat);
+    rim.rotation.z = Math.PI / 2;
+    inner.add(rim);
+
+    const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.46, 8), accentMat);
+    cap.rotation.z = Math.PI / 2;
+    inner.add(cap);
+
+    car.add(outer);
+    wheels.push(inner);
+    if (steerable) steerWheels.push(outer);
+  }
+  makeWheel(1.02, 1.18, true);
+  makeWheel(-1.02, 1.18, true);
+  makeWheel(1.02, -1.18, false);
+  makeWheel(-1.02, -1.18, false);
 
   scene.add(car);
 
@@ -478,6 +531,9 @@ import * as THREE from 'three';
     car.rotation.y = state.yaw;
     const spin = state.speed * dt * 2;
     wheels.forEach((w) => (w.rotation.x += spin));
+    // Front wheels visually steer toward the input
+    const targetSteer = ((input.left ? 1 : 0) - (input.right ? 1 : 0)) * 0.5;
+    steerWheels.forEach((p) => (p.rotation.y += (targetSteer - p.rotation.y) * 0.2));
 
     // --- Chase camera ---
     camGoal.set(
