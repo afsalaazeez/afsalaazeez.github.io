@@ -299,21 +299,16 @@ import * as THREE from 'three';
   // 4-link, long-travel coilovers, driveshafts, beadlock rims + mud tires.
   const car = new THREE.Group();
 
-  // --- Materials (orange bodied crawler over a matte-black exoskeleton) ---
-  const steelMat  = new THREE.MeshStandardMaterial({ color: 0x2c313b, metalness: 0.9, roughness: 0.5 });
-  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x14161c, metalness: 0.55, roughness: 0.65 }); // matte-black tube frame
-  const castMat   = new THREE.MeshStandardMaterial({ color: 0x1c2027, metalness: 0.85, roughness: 0.6 });
-  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xc2ccd8, metalness: 1.0, roughness: 0.18 });
-  const springMat = new THREE.MeshStandardMaterial({ color: 0xff8c1a, metalness: 0.5, roughness: 0.35, emissive: 0x4a2400, emissiveIntensity: 0.3 }); // orange coilovers
+  // --- Materials ---
+  const steelMat  = new THREE.MeshStandardMaterial({ color: 0x39414f, metalness: 0.95, roughness: 0.4 });
+  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x0bb6c4, metalness: 0.85, roughness: 0.3, emissive: 0x022f33, emissiveIntensity: 0.25 });
+  const castMat   = new THREE.MeshStandardMaterial({ color: 0x262b35, metalness: 0.85, roughness: 0.55 });
+  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xb9c6d6, metalness: 1.0, roughness: 0.15 });
+  const springMat = new THREE.MeshStandardMaterial({ color: 0x7f00ff, metalness: 0.6, roughness: 0.35, emissive: 0x1a0033, emissiveIntensity: 0.45 });
   const tireMat   = new THREE.MeshStandardMaterial({ color: 0x0a0c12, metalness: 0.1, roughness: 0.95 });
-  const rimMat    = new THREE.MeshStandardMaterial({ color: 0x20262f, metalness: 0.9, roughness: 0.35 });
+  const rimMat    = new THREE.MeshStandardMaterial({ color: 0x00f2fe, metalness: 0.95, roughness: 0.18, emissive: 0x00343a, emissiveIntensity: 0.4 });
   const boltMat   = new THREE.MeshStandardMaterial({ color: 0x8895a6, metalness: 0.9, roughness: 0.3 });
-  const seatMat   = new THREE.MeshStandardMaterial({ color: 0x14161c, metalness: 0.2, roughness: 0.85 });
-  // Bodywork
-  const orangeMat = new THREE.MeshStandardMaterial({ color: 0xf5820a, metalness: 0.45, roughness: 0.3, emissive: 0x140a00, emissiveIntensity: 0.2 });
-  const silverMat = new THREE.MeshStandardMaterial({ color: 0x8a93a3, metalness: 0.9, roughness: 0.4 });
-  const hubMat    = new THREE.MeshStandardMaterial({ color: 0xf5820a, metalness: 0.6, roughness: 0.3 });
-  const ledMat    = new THREE.MeshBasicMaterial({ color: 0xeaf6ff });
+  const seatMat   = new THREE.MeshStandardMaterial({ color: 0x141821, metalness: 0.2, roughness: 0.85 });
 
   const UPV = new THREE.Vector3(0, 1, 0);
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpD = new THREE.Vector3();
@@ -445,27 +440,7 @@ import * as THREE from 'three';
   strut(car, [-0.85, 0.65, -1.95], [0.85, 0.65, -1.95], 0.06, steelMat);
   slab(car, 1.0, 0.08, 0.12, new THREE.MeshBasicMaterial({ color: 0xeaffff }), 0, 2.02, 0.42, false);
 
-  // ====== Orange bodywork wrapping the black exoskeleton (ref: bodied crawler) ======
-  slab(car, 1.46, 0.5, 2.6, orangeMat, 0, 0.8, -0.2);                       // main body tub
-  const hood = slab(car, 1.5, 0.16, 1.5, orangeMat, 0, 1.08, 0.92); hood.rotation.x = -0.1;
-  const nose = slab(car, 1.5, 0.16, 0.55, orangeMat, 0, 1.02, 1.72); nose.rotation.x = -0.32;
-  slab(car, 1.46, 0.5, 0.22, silverMat, 0, 0.82, 1.8);                      // front fascia
-  // Twin vertical LED light-bar arrays (signature front detail)
-  [-0.74, 0.74].forEach((sx) => {
-    slab(car, 0.11, 0.66, 0.16, ledMat, sx, 0.92, 1.86, false);
-    slab(car, 0.05, 0.66, 0.18, silverMat, sx + (sx > 0 ? -0.1 : 0.1), 0.92, 1.86, false);
-  });
-  // Fender flares over each wheel
-  [[1, 1.3], [-1, 1.3], [1, -1.3], [-1, -1.3]].forEach(([s, z]) =>
-    slab(car, 0.5, 0.46, 1.6, orangeMat, s * 0.93, 1.2, z));
-  // Door / rocker skins
-  [-0.85, 0.85].forEach((sx) => slab(car, 0.1, 0.5, 1.5, orangeMat, sx, 1.05, -0.1));
-  slab(car, 1.55, 0.72, 0.45, orangeMat, 0, 1.18, -1.5);                    // rear quarter
-  slab(car, 1.44, 0.14, 1.5, orangeMat, 0, 1.99, -0.1);                     // cabin roof
-  slab(car, 1.2, 0.06, 1.2, cageMat, 0, 2.09, -0.1, false);                 // roof rack
-  drum(car, 0.02, 0.02, 0.45, cageMat, 0.5, 2.25, 0.2, null, false);        // antenna
-
-  const underglow = new THREE.PointLight(0xfff0e0, 4, 6);
+  const underglow = new THREE.PointLight(0x00f2fe, 5, 6);
   underglow.position.set(0, 0.35, 0);
   car.add(underglow);
 
@@ -514,7 +489,7 @@ import * as THREE from 'three';
       bolt.position.set(Math.cos(a) * 0.37, 0.22, Math.sin(a) * 0.37);
       wm.add(bolt);
     }
-    wm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.46, 10), hubMat)); // hub
+    wm.add(new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.46, 10), boltMat)); // hub
     for (let i = 0; i < 5; i++) {        // lug nuts
       const a = (i / 5) * Math.PI * 2;
       const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.48, 6), boltMat);
