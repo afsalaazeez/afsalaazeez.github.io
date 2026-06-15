@@ -301,7 +301,7 @@ import * as THREE from 'three';
 
   // --- Materials ---
   const steelMat  = new THREE.MeshStandardMaterial({ color: 0x39414f, metalness: 0.95, roughness: 0.4 });
-  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x0bb6c4, metalness: 0.85, roughness: 0.3, emissive: 0x022f33, emissiveIntensity: 0.25 });
+  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x8b0000, metalness: 0.85, roughness: 0.3, emissive: 0x2a0000, emissiveIntensity: 0.35 });
   const castMat   = new THREE.MeshStandardMaterial({ color: 0x262b35, metalness: 0.85, roughness: 0.55 });
   const chromeMat = new THREE.MeshStandardMaterial({ color: 0xb9c6d6, metalness: 1.0, roughness: 0.15 });
   const springMat = new THREE.MeshStandardMaterial({ color: 0x7f00ff, metalness: 0.6, roughness: 0.35, emissive: 0x1a0033, emissiveIntensity: 0.45 });
