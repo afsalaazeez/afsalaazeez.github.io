@@ -130,6 +130,7 @@ import * as THREE from 'three';
   const grid = new THREE.GridHelper(150, 75, 0x00f2fe, 0x1b3a5c);
   grid.material.opacity = 0.25;
   grid.material.transparent = true;
+  grid.visible = false;
   scene.add(grid);
 
   // Plaza accent ring
@@ -673,7 +674,6 @@ import * as THREE from 'three';
       groundMat.color.setHex(0x0c1322);
       groundMat.roughness = 0.95;
       sandMat.color.setHex(0x192035);
-      grid.visible = true;
       plazaMat.color.setHex(0x00f2fe);
       hemLight.color.setHex(0x8fbfff);
       hemLight.groundColor.setHex(0x10131f);
