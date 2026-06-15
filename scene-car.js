@@ -300,6 +300,126 @@ import * as THREE from 'three';
     treeData.push({ trunkMat, foliageMats });
   }
 
+  // ========================================================================
+  // CHICKENS — Minecraft-style blocky birds roaming the field
+  // ========================================================================
+  const FLEE_RADIUS = 12;
+  const chickens = [];
+  {
+    const CS = 1.5; // chicken scale (large)
+    const legLen = 0.48 * CS;
+    const bodyBottom = legLen;
+    const bodyH = 0.65 * CS;
+    const bodyCenter = bodyBottom + bodyH / 2;
+    const bodyTop = bodyBottom + bodyH;
+    const headBaseY = bodyTop + 0.35 * CS;
+
+    const cWhiteMat  = new THREE.MeshStandardMaterial({ color: 0xeeeedd, roughness: 0.82 });
+    const cOrangeMat = new THREE.MeshStandardMaterial({ color: 0xdd7700, roughness: 0.72 });
+    const cRedMat    = new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.72 });
+    const cEyeMat    = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.9  });
+    const cWingMat   = new THREE.MeshStandardMaterial({ color: 0xd8d8c8, roughness: 0.85 });
+
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + Math.random() * 0.5;
+      const r = 10 + Math.random() * 26;
+      const cx = Math.cos(angle) * r;
+      const cz = Math.sin(angle) * r;
+      const group = new THREE.Group();
+
+      // Body
+      const body = new THREE.Mesh(new THREE.BoxGeometry(0.8 * CS, bodyH, 1.05 * CS), cWhiteMat);
+      body.position.set(0, bodyCenter, 0);
+      body.castShadow = true;
+      group.add(body);
+
+      // Tail feathers
+      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.55 * CS, 0.42 * CS, 0.20 * CS), cWhiteMat);
+      tail.position.set(0, bodyTop - 0.08 * CS, -0.58 * CS);
+      tail.rotation.x = 0.55;
+      group.add(tail);
+
+      // Head group (animated for bob/peck)
+      const headGroup = new THREE.Group();
+      headGroup.position.set(0, headBaseY, 0.36 * CS);
+
+      const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.55 * CS, 0.55 * CS, 0.55 * CS), cWhiteMat);
+      headMesh.castShadow = true;
+      headGroup.add(headMesh);
+
+      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.16 * CS, 0.12 * CS, 0.22 * CS), cOrangeMat);
+      beak.position.set(0, -0.06 * CS, 0.38 * CS);
+      headGroup.add(beak);
+
+      const comb = new THREE.Mesh(new THREE.BoxGeometry(0.10 * CS, 0.22 * CS, 0.34 * CS), cRedMat);
+      comb.position.set(0, 0.37 * CS, 0.04 * CS);
+      headGroup.add(comb);
+
+      const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.10 * CS, 0.18 * CS, 0.10 * CS), cRedMat);
+      wattle.position.set(0, -0.25 * CS, 0.22 * CS);
+      headGroup.add(wattle);
+
+      [-1, 1].forEach((side) => {
+        const eye = new THREE.Mesh(new THREE.BoxGeometry(0.05 * CS, 0.09 * CS, 0.05 * CS), cEyeMat);
+        eye.position.set(side * 0.28 * CS, 0.04 * CS, 0.28 * CS);
+        headGroup.add(eye);
+      });
+      group.add(headGroup);
+
+      // Wings — pivot at shoulder so they flap when fleeing
+      const leftWingPivot  = new THREE.Group();
+      leftWingPivot.position.set(-0.42 * CS, bodyCenter + 0.10 * CS, 0);
+      const lwm = new THREE.Mesh(new THREE.BoxGeometry(0.14 * CS, 0.52 * CS, 0.88 * CS), cWingMat);
+      lwm.position.y = -0.26 * CS;
+      leftWingPivot.add(lwm);
+      group.add(leftWingPivot);
+
+      const rightWingPivot = new THREE.Group();
+      rightWingPivot.position.set(0.42 * CS, bodyCenter + 0.10 * CS, 0);
+      const rwm = new THREE.Mesh(new THREE.BoxGeometry(0.14 * CS, 0.52 * CS, 0.88 * CS), cWingMat);
+      rwm.position.y = -0.26 * CS;
+      rightWingPivot.add(rwm);
+      group.add(rightWingPivot);
+
+      // Legs — pivot at hip for striding
+      const leftLegPivot = new THREE.Group();
+      leftLegPivot.position.set(-0.18 * CS, bodyBottom, 0.08 * CS);
+      const llm = new THREE.Mesh(new THREE.BoxGeometry(0.13 * CS, legLen, 0.13 * CS), cOrangeMat);
+      llm.position.y = -legLen / 2;
+      leftLegPivot.add(llm);
+      const lf = new THREE.Mesh(new THREE.BoxGeometry(0.32 * CS, 0.06 * CS, 0.22 * CS), cOrangeMat);
+      lf.position.set(0.04 * CS, -legLen, 0.07 * CS);
+      leftLegPivot.add(lf);
+      group.add(leftLegPivot);
+
+      const rightLegPivot = new THREE.Group();
+      rightLegPivot.position.set(0.18 * CS, bodyBottom, 0.08 * CS);
+      const rlm = new THREE.Mesh(new THREE.BoxGeometry(0.13 * CS, legLen, 0.13 * CS), cOrangeMat);
+      rlm.position.y = -legLen / 2;
+      rightLegPivot.add(rlm);
+      const rf = new THREE.Mesh(new THREE.BoxGeometry(0.32 * CS, 0.06 * CS, 0.22 * CS), cOrangeMat);
+      rf.position.set(0.04 * CS, -legLen, 0.07 * CS);
+      rightLegPivot.add(rf);
+      group.add(rightLegPivot);
+
+      group.position.set(cx, getTerrainHeight(cx, cz), cz);
+      group.rotation.y = Math.random() * Math.PI * 2;
+      scene.add(group);
+
+      chickens.push({
+        x: cx, z: cz,
+        yaw: Math.random() * Math.PI * 2,
+        targetYaw: Math.random() * Math.PI * 2,
+        speed: 0,
+        wanderTimer: Math.random() * 2,
+        group, headGroup,
+        leftLegPivot, rightLegPivot,
+        leftWingPivot, rightWingPivot,
+        headBaseY,
+      });
+    }
+  }
+
   // Subtle floating welcome marker high above the spawn plaza
   const welcome = makeLabel('AFSAL A AZEEZ', 0xf8fafc);
   welcome.scale.set(7, 1.75, 1);
@@ -831,6 +951,66 @@ import * as THREE from 'three';
       });
       plaza.rotation.z = t * 0.2;
     }
+
+    // --- Animate chickens ---
+    chickens.forEach((ch, ci) => {
+      const dx = state.x - ch.x;
+      const dz = state.z - ch.z;
+      const distToCar = Math.sqrt(dx * dx + dz * dz);
+      const fleeing = distToCar < FLEE_RADIUS;
+
+      if (fleeing) {
+        const awayYaw = Math.atan2(-dx, -dz);
+        const diff = ((awayYaw - ch.yaw) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+        ch.yaw += diff * 0.22;
+        ch.speed = 5.5;
+      } else {
+        ch.wanderTimer -= dt;
+        if (ch.wanderTimer <= 0) {
+          ch.wanderTimer = 1.5 + Math.random() * 3.5;
+          ch.speed = Math.random() < 0.35 ? 0 : 1.2;
+          if (ch.speed > 0) ch.targetYaw = Math.random() * Math.PI * 2;
+        }
+        if (ch.speed > 0) {
+          const diff = ((ch.targetYaw - ch.yaw) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+          ch.yaw += diff * 0.04;
+        }
+      }
+
+      if (ch.speed > 0) {
+        ch.x += Math.sin(ch.yaw) * ch.speed * dt;
+        ch.z += Math.cos(ch.yaw) * ch.speed * dt;
+      }
+
+      // Keep chickens in the field
+      const cDist = Math.sqrt(ch.x * ch.x + ch.z * ch.z);
+      if (cDist > 50) {
+        ch.yaw = Math.atan2(-ch.x, -ch.z);
+        ch.targetYaw = ch.yaw;
+        ch.x *= 50 / cDist;
+        ch.z *= 50 / cDist;
+      }
+
+      ch.group.position.set(ch.x, getTerrainHeight(ch.x, ch.z), ch.z);
+      ch.group.rotation.y = ch.yaw;
+
+      // Leg striding
+      const rate = fleeing ? 10 : ch.speed > 0 ? 5 : 0;
+      const legSwing = rate > 0 ? Math.sin(t * rate + ci * 1.7) * 0.5 : 0;
+      ch.leftLegPivot.rotation.x  =  legSwing;
+      ch.rightLegPivot.rotation.x = -legSwing;
+
+      // Head bob when walking, peck when idle
+      const headBob = rate > 0
+        ? Math.sin(t * rate * 0.5 + ci) * 0.06
+        : Math.sin(t * 0.9 + ci * 2.3) > 0.85 ? -0.10 : 0;
+      ch.headGroup.position.y = ch.headBaseY + headBob;
+
+      // Wing flap when fleeing
+      const wingAngle = fleeing ? Math.sin(t * 18 + ci) * 0.65 + 0.4 : 0.12;
+      ch.leftWingPivot.rotation.z  =  wingAngle;
+      ch.rightWingPivot.rotation.z = -wingAngle;
+    });
 
     updateProximity();
     renderer.render(scene, camera);
