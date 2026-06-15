@@ -122,7 +122,7 @@ import * as THREE from 'three';
     const patchR = 2.2 + (i % 5) * 1.1;
     const patch = new THREE.Mesh(new THREE.CircleGeometry(patchR, 9), sandMat);
     patch.rotation.x = -Math.PI / 2;
-    patch.position.set(patchX, 0.07, patchZ);
+    patch.position.set(patchX, getTerrainHeight(patchX, patchZ) + 0.07, patchZ);
     patch.receiveShadow = true;
     scene.add(patch);
   }
@@ -181,7 +181,8 @@ import * as THREE from 'three';
     const color = new THREE.Color(k.color);
 
     const group = new THREE.Group();
-    group.position.set(x, 0, z);
+    const ky = getTerrainHeight(x, z);
+    group.position.set(x, ky, z);
 
     // Base pad
     const pad = new THREE.Mesh(
@@ -243,7 +244,7 @@ import * as THREE from 'three';
     group.add(pring);
 
     scene.add(group);
-    kioskMeshes.push({ ...k, group, crystal, pring, pos: new THREE.Vector3(x, 0, z) });
+    kioskMeshes.push({ ...k, group, crystal, pring, pos: new THREE.Vector3(x, ky, z) });
   });
 
   // ========================================================================
@@ -260,7 +261,7 @@ import * as THREE from 'three';
     const s = 0.7 + Math.random() * 0.7;
 
     const group = new THREE.Group();
-    group.position.set(x, 0, z);
+    group.position.set(x, getTerrainHeight(x, z), z);
     group.rotation.y = Math.random() * Math.PI * 2;
 
     const trunkMat = new THREE.MeshStandardMaterial({ color: 0x1e0d05, roughness: 0.92, metalness: 0.0 });
