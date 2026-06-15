@@ -294,21 +294,21 @@ import * as THREE from 'three';
   // ========================================================================
   // CAR
   // ========================================================================
-  // Hardcore tube-frame rock crawler buggy. Front of the car points toward +Z.
-  // Fully exposed CNC-bent tube chassis + cage, portal axles, triangulated
-  // 4-link, long-travel coilovers, driveshafts, beadlock rims + mud tires.
+  // Open-top dune buggy / trail truck. Front of the car points toward +Z.
+  // Bright lime-green plastic tube frame, wide stance, round LED headlights,
+  // yellow coilover springs, white beadlock rims, deep-tread mud tires.
   const car = new THREE.Group();
 
-  // --- Materials ---
-  const steelMat  = new THREE.MeshStandardMaterial({ color: 0x39414f, metalness: 0.95, roughness: 0.4 });
-  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x8b0000, metalness: 0.85, roughness: 0.3, emissive: 0x2a0000, emissiveIntensity: 0.35 });
-  const castMat   = new THREE.MeshStandardMaterial({ color: 0x262b35, metalness: 0.85, roughness: 0.55 });
-  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xb9c6d6, metalness: 1.0, roughness: 0.15 });
-  const springMat = new THREE.MeshStandardMaterial({ color: 0x7f00ff, metalness: 0.6, roughness: 0.35, emissive: 0x1a0033, emissiveIntensity: 0.45 });
+  // --- Materials (lime-green plastic dune buggy / trail truck) ---
+  const steelMat  = new THREE.MeshStandardMaterial({ color: 0x111318, metalness: 0.6, roughness: 0.55 });
+  const cageMat   = new THREE.MeshStandardMaterial({ color: 0x76ff03, metalness: 0.04, roughness: 0.60 }); // bright lime plastic
+  const castMat   = new THREE.MeshStandardMaterial({ color: 0x1a1c22, metalness: 0.75, roughness: 0.55 });
+  const chromeMat = new THREE.MeshStandardMaterial({ color: 0xd0d8e0, metalness: 1.0, roughness: 0.14 });
+  const springMat = new THREE.MeshStandardMaterial({ color: 0xffd600, metalness: 0.2, roughness: 0.45, emissive: 0x332c00, emissiveIntensity: 0.25 }); // yellow coilovers
   const tireMat   = new THREE.MeshStandardMaterial({ color: 0x0a0c12, metalness: 0.1, roughness: 0.95 });
-  const rimMat    = new THREE.MeshStandardMaterial({ color: 0x00f2fe, metalness: 0.95, roughness: 0.18, emissive: 0x00343a, emissiveIntensity: 0.4 });
-  const boltMat   = new THREE.MeshStandardMaterial({ color: 0x8895a6, metalness: 0.9, roughness: 0.3 });
-  const seatMat   = new THREE.MeshStandardMaterial({ color: 0x141821, metalness: 0.2, roughness: 0.85 });
+  const rimMat    = new THREE.MeshStandardMaterial({ color: 0xf0f0f0, metalness: 0.25, roughness: 0.35 }); // white rims
+  const boltMat   = new THREE.MeshStandardMaterial({ color: 0x888888, metalness: 0.7, roughness: 0.4 });
+  const seatMat   = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.1, roughness: 0.9 });
 
   const UPV = new THREE.Vector3(0, 1, 0);
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpD = new THREE.Vector3();
@@ -438,9 +438,31 @@ import * as THREE from 'three';
   slab(car, 1.0, 0.06, 1.7, steelMat, 0, 0.4, -0.1, false);
   strut(car, [-0.85, 0.6, 2.0], [0.85, 0.6, 2.0], 0.06, steelMat);
   strut(car, [-0.85, 0.65, -1.95], [0.85, 0.65, -1.95], 0.06, steelMat);
-  slab(car, 1.0, 0.08, 0.12, new THREE.MeshBasicMaterial({ color: 0xeaffff }), 0, 2.02, 0.42, false);
+  slab(car, 1.0, 0.08, 0.12, new THREE.MeshBasicMaterial({ color: 0xffffff }), 0, 2.02, 0.42, false);
 
-  const underglow = new THREE.PointLight(0x00f2fe, 5, 6);
+  // ---- Dune buggy / trail truck body panels (lime plastic) ----
+  slab(car, 1.45, 0.14, 3.2, cageMat, 0, 0.52, -0.1, false);           // flat floor pan
+  const nosePanel = slab(car, 1.45, 0.38, 0.72, cageMat, 0, 0.82, 1.65); // front nose
+  nosePanel.rotation.x = -0.22;
+  slab(car, 1.45, 0.22, 0.5, cageMat, 0, 0.56, 1.9, false);            // front splitter lip
+  slab(car, 1.45, 0.58, 0.65, cageMat, 0, 0.86, -1.7);                 // rear engine pod
+  [-0.76, 0.76].forEach((sx) =>
+    slab(car, 0.13, 0.28, 2.6, cageMat, sx, 0.66, -0.1, false));        // side rockers
+  [[1, 1.3], [-1, 1.3], [1, -1.3], [-1, -1.3]].forEach(([s, z]) =>
+    slab(car, 0.44, 0.42, 1.6, cageMat, s * 0.97, 1.06, z));            // fender blisters
+  // Round LED headlights — signature dune buggy detail
+  const lensGeo = new THREE.SphereGeometry(0.15, 10, 8);
+  const lensMat = new THREE.MeshBasicMaterial({ color: 0xfffae8 });
+  [-0.5, 0.5].forEach((sx) => {
+    const lens = new THREE.Mesh(lensGeo, lensMat);
+    lens.position.set(sx, 0.88, 1.97);
+    car.add(lens);
+    const hl = new THREE.PointLight(0xfff8e0, 2.5, 5);
+    hl.position.set(sx, 0.88, 2.1);
+    car.add(hl);
+  });
+
+  const underglow = new THREE.PointLight(0x44ff00, 5, 6);
   underglow.position.set(0, 0.35, 0);
   car.add(underglow);
 
