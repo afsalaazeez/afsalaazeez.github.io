@@ -88,11 +88,44 @@ import * as THREE from 'three';
   // ========================================================================
   // GROUND + GRID
   // ========================================================================
+  // Bumpy terrain: PlaneGeometry with per-vertex height displacement
+  const terrainGeo = new THREE.PlaneGeometry(150, 150, 64, 64);
+  terrainGeo.rotateX(-Math.PI / 2);
+  const terrPos = terrainGeo.attributes.position;
+  for (let i = 0; i < terrPos.count; i++) {
+    const tx = terrPos.getX(i);
+    const tz = terrPos.getZ(i);
+    const dist = Math.sqrt(tx * tx + tz * tz);
+    const fade = THREE.MathUtils.clamp((dist - 8) / 22, 0, 1);
+    const h = (
+      Math.sin(tx * 0.20 + 0.6) * Math.cos(tz * 0.24 + 1.1) * 0.85 +
+      Math.sin(tx * 0.42 - 0.9) * Math.sin(tz * 0.31 + 0.4) * 0.55 +
+      Math.cos(tx * 0.11 + tz * 0.14) * 1.05 +
+      Math.sin(tx * 0.63 + tz * 0.47) * 0.30 +
+      Math.cos(tx * 0.09 - tz * 0.19) * 0.45
+    ) * fade;
+    terrPos.setY(i, h);
+  }
+  terrainGeo.computeVertexNormals();
   const groundMat = new THREE.MeshStandardMaterial({ color: 0x0c1322, roughness: 0.95, metalness: 0.1 });
-  const ground = new THREE.Mesh(new THREE.CircleGeometry(75, 64), groundMat);
-  ground.rotation.x = -Math.PI / 2;
+  const ground = new THREE.Mesh(terrainGeo, groundMat);
   ground.receiveShadow = true;
   scene.add(ground);
+
+  // Sand / dust patches scattered across the terrain (deterministic positions)
+  const sandMat = new THREE.MeshStandardMaterial({ color: 0x192035, roughness: 0.98, metalness: 0.0 });
+  for (let i = 0; i < 16; i++) {
+    const angle = (i / 16) * Math.PI * 2 + (i % 3) * 0.65;
+    const r = 9 + (i % 7) * 5.4 + Math.sin(i * 2.1) * 3.2;
+    const patchX = Math.cos(angle) * r;
+    const patchZ = Math.sin(angle) * r;
+    const patchR = 2.2 + (i % 5) * 1.1;
+    const patch = new THREE.Mesh(new THREE.CircleGeometry(patchR, 9), sandMat);
+    patch.rotation.x = -Math.PI / 2;
+    patch.position.set(patchX, 0.07, patchZ);
+    patch.receiveShadow = true;
+    scene.add(patch);
+  }
 
   const grid = new THREE.GridHelper(150, 75, 0x00f2fe, 0x1b3a5c);
   grid.material.opacity = 0.25;
@@ -638,6 +671,7 @@ import * as THREE from 'three';
       scene.fog.near = 40; scene.fog.far = 130;
       groundMat.color.setHex(0x0c1322);
       groundMat.roughness = 0.95;
+      sandMat.color.setHex(0x192035);
       grid.visible = true;
       plazaMat.color.setHex(0x00f2fe);
       hemLight.color.setHex(0x8fbfff);
@@ -657,6 +691,7 @@ import * as THREE from 'three';
       scene.fog.near = 55; scene.fog.far = 160;
       groundMat.color.setHex(0x5c9e42);
       groundMat.roughness = 0.88;
+      sandMat.color.setHex(0xd4a862);
       grid.visible = false;
       plazaMat.color.setHex(0xf0c030);
       hemLight.color.setHex(0xc8e4f8);
