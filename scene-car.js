@@ -71,7 +71,8 @@ import * as THREE from 'three';
   // ========================================================================
   // LIGHTS
   // ========================================================================
-  scene.add(new THREE.HemisphereLight(0x8fbfff, 0x10131f, 0.7));
+  const hemLight = new THREE.HemisphereLight(0x8fbfff, 0x10131f, 0.7);
+  scene.add(hemLight);
   const sun = new THREE.DirectionalLight(0xffffff, 1.1);
   sun.position.set(30, 50, 20);
   sun.castShadow = true;
@@ -87,10 +88,8 @@ import * as THREE from 'three';
   // ========================================================================
   // GROUND + GRID
   // ========================================================================
-  const ground = new THREE.Mesh(
-    new THREE.CircleGeometry(75, 64),
-    new THREE.MeshStandardMaterial({ color: 0x0c1322, roughness: 0.95, metalness: 0.1 })
-  );
+  const groundMat = new THREE.MeshStandardMaterial({ color: 0x0c1322, roughness: 0.95, metalness: 0.1 });
+  const ground = new THREE.Mesh(new THREE.CircleGeometry(75, 64), groundMat);
   ground.rotation.x = -Math.PI / 2;
   ground.receiveShadow = true;
   scene.add(ground);
@@ -101,10 +100,8 @@ import * as THREE from 'three';
   scene.add(grid);
 
   // Plaza accent ring
-  const plaza = new THREE.Mesh(
-    new THREE.RingGeometry(2.6, 3, 48),
-    new THREE.MeshBasicMaterial({ color: 0x00f2fe, transparent: true, opacity: 0.4, side: THREE.DoubleSide })
-  );
+  const plazaMat = new THREE.MeshBasicMaterial({ color: 0x00f2fe, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+  const plaza = new THREE.Mesh(new THREE.RingGeometry(2.6, 3, 48), plazaMat);
   plaza.rotation.x = -Math.PI / 2;
   plaza.position.y = 0.02;
   scene.add(plaza);
@@ -141,6 +138,7 @@ import * as THREE from 'three';
   // ========================================================================
   const RING_RADIUS = 26;
   const kioskMeshes = [];
+  const padMat = new THREE.MeshStandardMaterial({ color: 0x141c2e, roughness: 0.7, metalness: 0.3 });
 
   KIOSKS.forEach((k, i) => {
     const angle = (i / KIOSKS.length) * Math.PI * 2;
@@ -154,7 +152,7 @@ import * as THREE from 'three';
     // Base pad
     const pad = new THREE.Mesh(
       new THREE.CylinderGeometry(3, 3, 0.4, 24),
-      new THREE.MeshStandardMaterial({ color: 0x141c2e, roughness: 0.7, metalness: 0.3 })
+      padMat
     );
     pad.position.y = 0.2;
     pad.receiveShadow = true;
@@ -215,27 +213,56 @@ import * as THREE from 'three';
   });
 
   // ========================================================================
-  // SCENERY — scattered low-poly props
+  // SCENERY — low-poly trees (pine + round-crowned). Materials stored for
+  // dynamic theme switching between dark silhouettes and bright meadow greens.
   // ========================================================================
-  const propColors = [0x14324d, 0x1a2740, 0x122a3f];
-  for (let i = 0; i < 40; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const r = 36 + Math.random() * 32;
-    const x = Math.cos(a) * r;
-    const z = Math.sin(a) * r;
-    const h = 2 + Math.random() * 10;
-    const prop = new THREE.Mesh(
-      new THREE.BoxGeometry(1.4 + Math.random() * 2.5, h, 1.4 + Math.random() * 2.5),
-      new THREE.MeshStandardMaterial({
-        color: propColors[i % propColors.length],
-        roughness: 0.9,
-        metalness: 0.2,
-      })
-    );
-    prop.position.set(x, h / 2, z);
-    prop.castShadow = true;
-    prop.receiveShadow = true;
-    scene.add(prop);
+  const treeData = [];
+  for (let i = 0; i < 38; i++) {
+    const angle = (i / 38) * Math.PI * 2 + (Math.random() - 0.5) * 0.28;
+    const r = 38 + Math.random() * 24;
+    const x = Math.cos(angle) * r;
+    const z = Math.sin(angle) * r;
+    const trunkH = 2.0 + Math.random() * 3.5;
+    const s = 0.7 + Math.random() * 0.7;
+
+    const group = new THREE.Group();
+    group.position.set(x, 0, z);
+    group.rotation.y = Math.random() * Math.PI * 2;
+
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x1e0d05, roughness: 0.92, metalness: 0.0 });
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12 * s, 0.22 * s, trunkH, 6), trunkMat);
+    trunk.position.y = trunkH / 2;
+    trunk.castShadow = true;
+    trunk.receiveShadow = true;
+    group.add(trunk);
+
+    const foliageMats = [];
+    const isPine = i % 3 !== 0;
+
+    if (isPine) {
+      const layers = 2 + (i % 2);
+      for (let l = 0; l < layers; l++) {
+        const fm = new THREE.MeshStandardMaterial({ color: 0x0c1a0a, roughness: 0.85, metalness: 0.0 });
+        foliageMats.push(fm);
+        const cone = new THREE.Mesh(
+          new THREE.ConeGeometry((1.1 - l * 0.2) * s, (1.6 - l * 0.15) * s, 6),
+          fm
+        );
+        cone.position.y = trunkH + l * 1.1 * s;
+        cone.castShadow = true;
+        group.add(cone);
+      }
+    } else {
+      const fm = new THREE.MeshStandardMaterial({ color: 0x0c1a0a, roughness: 0.85, metalness: 0.0 });
+      foliageMats.push(fm);
+      const crown = new THREE.Mesh(new THREE.SphereGeometry(1.1 * s, 8, 7), fm);
+      crown.position.y = trunkH + 0.85 * s;
+      crown.castShadow = true;
+      group.add(crown);
+    }
+
+    scene.add(group);
+    treeData.push({ trunkMat, foliageMats });
   }
 
   // Subtle floating welcome marker high above the spawn plaza
@@ -258,12 +285,11 @@ import * as THREE from 'three';
   }
   const starGeo = new THREE.BufferGeometry();
   starGeo.setAttribute('position', new THREE.BufferAttribute(sp, 3));
-  scene.add(
-    new THREE.Points(
-      starGeo,
-      new THREE.PointsMaterial({ color: 0x9fd8ff, size: 1.1, transparent: true, opacity: 0.7 })
-    )
+  const starPoints = new THREE.Points(
+    starGeo,
+    new THREE.PointsMaterial({ color: 0x9fd8ff, size: 1.1, transparent: true, opacity: 0.7 })
   );
+  scene.add(starPoints);
 
   // ========================================================================
   // CAR
@@ -600,13 +626,52 @@ import * as THREE from 'three';
   }
   window.addEventListener('resize', onResize);
 
-  // Theme just shifts the sky/fog tone
-  window.addEventListener('themechange', (e) => {
-    const dark = e.detail.theme !== 'light';
-    const sky = dark ? 0x070b15 : 0xbcd2f0;
-    scene.background = new THREE.Color(sky);
-    scene.fog.color = new THREE.Color(sky);
-  });
+  // Theme: dark = cyberpunk neon / light = green meadow day
+  const MEADOW_GREENS = [0x3d8a28, 0x2d7020, 0x4a9e35, 0x5aaa40];
+  function applyTheme(dark) {
+    if (dark) {
+      scene.background.setHex(0x070b15);
+      scene.fog.color.setHex(0x070b15);
+      scene.fog.near = 40; scene.fog.far = 130;
+      groundMat.color.setHex(0x0c1322);
+      groundMat.roughness = 0.95;
+      grid.visible = true;
+      plazaMat.color.setHex(0x00f2fe);
+      hemLight.color.setHex(0x8fbfff);
+      hemLight.groundColor.setHex(0x10131f);
+      hemLight.intensity = 0.7;
+      sun.color.setHex(0xffffff);
+      sun.intensity = 1.1;
+      starPoints.visible = true;
+      padMat.color.setHex(0x141c2e);
+      treeData.forEach(({ trunkMat, foliageMats }) => {
+        trunkMat.color.setHex(0x1e0d05);
+        foliageMats.forEach((m) => m.color.setHex(0x0c1a0a));
+      });
+    } else {
+      scene.background.setHex(0x7ec8e3);
+      scene.fog.color.setHex(0xaaddf0);
+      scene.fog.near = 55; scene.fog.far = 160;
+      groundMat.color.setHex(0x5c9e42);
+      groundMat.roughness = 0.88;
+      grid.visible = false;
+      plazaMat.color.setHex(0xf0c030);
+      hemLight.color.setHex(0xc8e4f8);
+      hemLight.groundColor.setHex(0x4e8c35);
+      hemLight.intensity = 1.1;
+      sun.color.setHex(0xfff5d0);
+      sun.intensity = 1.7;
+      starPoints.visible = false;
+      padMat.color.setHex(0x9e8c6b);
+      treeData.forEach(({ trunkMat, foliageMats }, idx) => {
+        trunkMat.color.setHex(0x7a4f28);
+        foliageMats.forEach((m) => m.color.setHex(MEADOW_GREENS[idx % MEADOW_GREENS.length]));
+      });
+    }
+  }
+  window.addEventListener('themechange', (e) => applyTheme(e.detail.theme !== 'light'));
+  // Apply on load in case user had light mode saved
+  applyTheme(document.documentElement.getAttribute('data-theme') !== 'light');
 
   // ========================================================================
   // MAIN LOOP

@@ -15,7 +15,7 @@ body {
   overflow: hidden; /* the world fills the screen; no page scroll while driving */
 }
 [data-theme='light'] body {
-  background-color: #bcd2f0;
+  background-color: #7ec8e3;
 }
 
 /* The world canvas fills the viewport behind the UI */
