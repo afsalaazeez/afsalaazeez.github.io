@@ -301,7 +301,7 @@ import * as THREE from 'three';
 
   // --- Materials ---
   const steelMat    = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.75, roughness: 0.45 });
-  const cageMat     = new THREE.MeshStandardMaterial({ color: 0xcc1111, metalness: 0.75, roughness: 0.32 }); // red tube cage
+  const cageMat     = new THREE.MeshStandardMaterial({ color: 0xcc1111, metalness: 0.15, roughness: 0.68 }); // matte red painted metal
   const castMat     = new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 0.82, roughness: 0.50 });
   const chromeMat   = new THREE.MeshStandardMaterial({ color: 0xd0d8e0, metalness: 1.0,  roughness: 0.14 });
   const springMat   = new THREE.MeshStandardMaterial({ color: 0xdd1111, metalness: 0.55, roughness: 0.30, emissive: 0x280000, emissiveIntensity: 0.2 }); // red coilovers
@@ -310,7 +310,7 @@ import * as THREE from 'three';
   const boltMat     = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8,  roughness: 0.35 });
   const beadlockMat = new THREE.MeshStandardMaterial({ color: 0xcc0000, metalness: 0.7,  roughness: 0.30 }); // red beadlock ring
   const seatMat     = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.1,  roughness: 0.90 });
-  const bodyMat     = new THREE.MeshStandardMaterial({ color: 0xd0d0d0, metalness: 0.25, roughness: 0.58 }); // silver polycarbonate
+  const bodyMat     = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 0.22, roughness: 0.55 }); // silver polycarbonate
 
   const UPV = new THREE.Vector3(0, 1, 0);
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpD = new THREE.Vector3();
@@ -350,13 +350,13 @@ import * as THREE from 'three';
     ['dr','lr'],['lm','rf'],['af','bf'],['lf','bf'],['db','af'],['db','lm'],['lr','rr'],
   ];
   sideEdges.forEach(([a, b]) => {
-    strut(car, CAGE[a], CAGE[b], 0.06, cageMat);
-    strut(car, mir(a), mir(b), 0.06, cageMat);
+    strut(car, CAGE[a], CAGE[b], 0.04, cageMat);
+    strut(car, mir(a), mir(b), 0.04, cageMat);
   });
   // Cross members + roof X-brace (right node -> left node)
   [['af','af'],['rf','rf'],['rr','rr'],['dr','dr'],['bf','bf'],['lf','lf'],
    ['lr','lr'],['db','db'],['rf','rr'],['rr','rf']].forEach(([a, b]) =>
-    strut(car, CAGE[a], mir(b), 0.055, cageMat));
+    strut(car, CAGE[a], mir(b), 0.038, cageMat));
   // Welded node gussets
   Object.keys(CAGE).forEach((k) => {
     [1, -1].forEach((s) => {
@@ -443,8 +443,10 @@ import * as THREE from 'three';
   slab(car, 1.0, 0.08, 0.12, new THREE.MeshBasicMaterial({ color: 0xffffff }), 0, 2.02, 0.42, false);
 
   // ---- RC rock crawler body ----
-  // Silver polycarbonate side panels inside the red cage
-  [-0.72, 0.72].forEach((sx) => slab(car, 0.08, 0.72, 2.2, bodyMat, sx, 1.0, -0.1));
+  // Silver polycarbonate side panels — slightly proud so they read from the side
+  [-0.74, 0.74].forEach((sx) => slab(car, 0.10, 0.72, 2.2, bodyMat, sx, 1.0, -0.1));
+  // Rear body panel — faces the chase camera directly
+  slab(car, 1.44, 0.70, 0.08, bodyMat, 0, 1.05, -1.80);
   // Flat roof panel
   slab(car, 1.44, 0.07, 1.45, bodyMat, 0, 1.86, -0.1);
   // Angled windscreen panel
@@ -453,18 +455,17 @@ import * as THREE from 'three';
   // Front & rear bumper bars
   slab(car, 1.3, 0.38, 0.12, steelMat, 0, 0.70, 1.96);
   slab(car, 1.3, 0.38, 0.12, steelMat, 0, 0.70, -1.96);
-  // Spare tyre standing upright on the roof rack
-  const spare = new THREE.Mesh(new THREE.TorusGeometry(0.50, 0.20, 8, 14), tireMat);
+  // Spare tyre — properly seated flat on the roof rack, center of roof
+  const spare = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.13, 8, 14), tireMat);
   spare.rotation.x = Math.PI / 2;
-  spare.position.set(0, 2.14, 0.26);
+  spare.position.set(0, 2.01, -0.20);
   car.add(spare);
-  const spareRim = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.12, 8), rimMat);
-  spareRim.rotation.x = Math.PI / 2;
-  spareRim.position.set(0, 2.14, 0.26);
+  const spareRim = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.09, 8), rimMat);
+  spareRim.position.set(0, 2.01, -0.20);
   car.add(spareRim);
-  const spareBeadlock = new THREE.Mesh(new THREE.TorusGeometry(0.33, 0.022, 6, 18), beadlockMat);
+  const spareBeadlock = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.016, 6, 18), beadlockMat);
   spareBeadlock.rotation.x = Math.PI / 2;
-  spareBeadlock.position.set(0, 2.14, 0.20);
+  spareBeadlock.position.set(0, 2.06, -0.20);
   car.add(spareBeadlock);
 
   const underglow = new THREE.PointLight(0xff1100, 4, 6);
