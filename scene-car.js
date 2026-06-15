@@ -573,9 +573,10 @@ import * as THREE from 'three';
   // CAR STATE + CONTROLS
   // ========================================================================
   const state = {
-    x: 0, z: -8,       // spawn just south of centre
-    yaw: 0,            // faces +Z
+    x: 0, z: -8, y: 0,   // spawn just south of centre
+    yaw: 0,               // faces +Z
     speed: 0,
+    pitch: 0, roll: 0,    // terrain-slope tilt (radians, lerped)
   };
   const MAX_SPEED = 26;
   const ACCEL = 34;
@@ -711,6 +712,19 @@ import * as THREE from 'three';
   // Apply on load in case user had light mode saved
   applyTheme(document.documentElement.getAttribute('data-theme') !== 'light');
 
+  // Height sampler — exact mirror of the terrain geometry displacement formula
+  function getTerrainHeight(x, z) {
+    const dist = Math.sqrt(x * x + z * z);
+    const fade = THREE.MathUtils.clamp((dist - 8) / 22, 0, 1);
+    return (
+      Math.sin(x * 0.20 + 0.6) * Math.cos(z * 0.24 + 1.1) * 0.85 +
+      Math.sin(x * 0.42 - 0.9) * Math.sin(z * 0.31 + 0.4) * 0.55 +
+      Math.cos(x * 0.11 + z * 0.14) * 1.05 +
+      Math.sin(x * 0.63 + z * 0.47) * 0.30 +
+      Math.cos(x * 0.09 - z * 0.19) * 0.45
+    ) * fade;
+  }
+
   // ========================================================================
   // MAIN LOOP
   // ========================================================================
@@ -769,23 +783,41 @@ import * as THREE from 'three';
       }
     });
 
+    // --- Terrain-following: lift car to ground height + tilt to slope ---
+    const terrH = getTerrainHeight(state.x, state.z);
+    state.y += (terrH - state.y) * 0.18;
+    const TS = 0.9;
+    const sinYaw = Math.sin(state.yaw), cosYaw = Math.cos(state.yaw);
+    const tPitch = Math.atan2(
+      getTerrainHeight(state.x + sinYaw * TS, state.z + cosYaw * TS) -
+      getTerrainHeight(state.x - sinYaw * TS, state.z - cosYaw * TS),
+      2 * TS
+    );
+    const tRoll = Math.atan2(
+      getTerrainHeight(state.x + cosYaw * TS, state.z - sinYaw * TS) -
+      getTerrainHeight(state.x - cosYaw * TS, state.z + sinYaw * TS),
+      2 * TS
+    );
+    state.pitch += (tPitch - state.pitch) * 0.12;
+    state.roll  += (tRoll  - state.roll)  * 0.12;
+
     // --- Apply to car mesh ---
-    car.position.set(state.x, 0, state.z);
-    car.rotation.y = state.yaw;
+    car.position.set(state.x, state.y, state.z);
+    car.rotation.set(-state.pitch, state.yaw, state.roll, 'YXZ');
     const spin = state.speed * dt * 2;
     wheels.forEach((w) => (w.rotation.x += spin));
     // Front wheels visually steer toward the input
     const targetSteer = ((input.left ? 1 : 0) - (input.right ? 1 : 0)) * 0.5;
     steerWheels.forEach((p) => (p.rotation.y += (targetSteer - p.rotation.y) * 0.2));
 
-    // --- Chase camera (closer + lower to show off the buggy detail) ---
+    // --- Chase camera (tracks car height over terrain) ---
     camGoal.set(
       state.x - fx * 9.5,
-      6.8,
+      state.y + 6.8,
       state.z - fz * 9.5
     );
     camera.position.lerp(camGoal, 1 - Math.pow(0.0008, dt));
-    camTarget.set(state.x + fx * 3.5, 1.4, state.z + fz * 3.5);
+    camTarget.set(state.x + fx * 3.5, state.y + 1.4, state.z + fz * 3.5);
     camera.lookAt(camTarget);
 
     // --- Animate kiosks ---
