@@ -141,6 +141,19 @@ button, input, textarea {
   position: relative;
 }
 
+/* Screen-reader only: visually hidden but crawlable by search engines */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .glass {
   background: var(--card-bg);
   backdrop-filter: blur(16px) saturate(120%);
