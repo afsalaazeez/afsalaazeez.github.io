@@ -1165,13 +1165,20 @@ import * as THREE from 'three';
     ArrowLeft: 'left', KeyA: 'left',
     ArrowRight: 'right', KeyD: 'right',
   };
+  const isTyping = (e) => e.target.matches('input, textarea, select');
   window.addEventListener('keydown', (e) => {
+    if (isTyping(e)) return;
     const a = keyMap[e.code];
     if (a) { input[a] = true; e.preventDefault(); }
   });
   window.addEventListener('keyup', (e) => {
+    if (isTyping(e)) return;
     const a = keyMap[e.code];
     if (a) { input[a] = false; }
+  });
+  document.addEventListener('focusin', (e) => {
+    if (e.target.matches('input, textarea, select'))
+      input.forward = input.back = input.left = input.right = false;
   });
 
   // Expose controls for on-screen / touch buttons + nav teleport
