@@ -167,112 +167,294 @@ import * as THREE from 'three';
     return sprite;
   }
 
-  // Canvas texture of ancient runes + geometric sigils (used as emissiveMap)
-  function makeRuneTexture(color) {
-    const W = 512, H = 1024;
+  // Canvas texture — single grand arcane composition (used as emissiveMap)
+  function makeRuneTexture(color, idx = 0) {
+    const W = 1024, H = 1024;
     const cvs = document.createElement('canvas');
     cvs.width = W; cvs.height = H;
     const ctx = cvs.getContext('2d');
-    const hex = '#' + color.getHexString();
 
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, W, H);
-
-    ctx.strokeStyle = hex;
-    ctx.fillStyle   = hex;
-    ctx.shadowColor = hex;
-
-    // Deterministic RNG so texture is consistent across reloads
-    let _s = 0xdeadbeef;
+    // Unique seed per pillar so each kiosk gets a distinct pattern
+    const cr = Math.round(color.r * 255), cg = Math.round(color.g * 255), cb = Math.round(color.b * 255);
+    let _s = (((cr << 16) | (cg << 8) | cb) ^ (idx * 0x9e3779b9 + 0xdeadbeef)) | 1;
     const rand = () => { _s ^= _s << 13; _s ^= _s >> 17; _s ^= _s << 5; return ((_s >>> 0) / 0xffffffff); };
 
-    // Double outer border
-    ctx.shadowBlur = 8;
-    ctx.lineWidth  = 3;
-    ctx.strokeRect(8,  8,  W - 16,  H - 16);
-    ctx.strokeRect(16, 16, W - 32, H - 32);
+    const hex = '#' + color.getHexString();
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = hex; ctx.fillStyle = hex; ctx.shadowColor = hex;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 
-    // Four horizontal dividers splitting pillar into sections
-    const sections = 4;
-    for (let s = 1; s < sections; s++) {
-      const dy = Math.round((H / sections) * s);
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(16, dy); ctx.lineTo(W - 16, dy); ctx.stroke();
-      // Diamond accent at midpoint
+    const RUNES = ['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ',
+                   'ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ'];
+
+    // ── 5-layer ornate border ────────────────────────────────────
+    [[4,1,0.25],[12,2,0.6],[20,1,0.2],[32,2.5,1.0],[44,1,0.3]].forEach(([ins,w,a]) => {
+      ctx.lineWidth = w; ctx.globalAlpha = a; ctx.shadowBlur = ins === 32 ? 16 : 4;
+      ctx.strokeRect(ins, ins, W - ins*2, H - ins*2);
+    });
+    ctx.globalAlpha = 1;
+
+    // ── Four unique corner ornaments (triangle / square / pentagon / hexagon) ──
+    [[66,66],[W-66,66],[66,H-66],[W-66,H-66]].forEach(([cx,cy],ci) => {
+      ctx.shadowBlur = 14; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.8;
+      ctx.beginPath(); ctx.arc(cx,cy,40,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,24,0,Math.PI*2); ctx.stroke();
+      const sides = ci + 3;
+      ctx.beginPath();
+      for (let v = 0; v < sides; v++) {
+        const a = (v/sides)*Math.PI*2 - Math.PI/2;
+        v === 0 ? ctx.moveTo(cx+Math.cos(a)*18,cy+Math.sin(a)*18)
+                : ctx.lineTo(cx+Math.cos(a)*18,cy+Math.sin(a)*18);
+      }
+      ctx.closePath(); ctx.stroke();
+      ctx.font = '22px serif'; ctx.globalAlpha = 0.9; ctx.shadowBlur = 16;
+      ctx.fillText(RUNES[(ci*7 + idx*3 + 2) % RUNES.length], cx, cy);
+    });
+    ctx.globalAlpha = 1;
+
+    // ── Vertical edge rune strips (varying sizes, unique per pillar) ──
+    ctx.shadowBlur = 8;
+    for (let row = 0; row < 26; row++) {
+      const ry = 52 + row*(H-104)/25;
+      ctx.font = `${16+Math.floor(rand()*11)}px serif`;
+      ctx.globalAlpha = 0.42 + rand()*0.42;
+      ctx.fillText(RUNES[(row*3 + idx) % RUNES.length], 26, ry);
+      ctx.fillText(RUNES[(row*7 + 11 + idx) % RUNES.length], W-26, ry);
+    }
+    ctx.globalAlpha = 1;
+
+    // ── Grand central mandala ────────────────────────────────────
+    const CX = W/2, CY = H/2, R = 270;
+
+    // Five concentric rings at decreasing opacity
+    [[R,2.5,1.0,20],[R*0.74,1.5,0.85,12],[R*0.53,1.2,0.65,8],
+     [R*0.35,1,0.55,7],[R*0.18,0.8,0.45,5]].forEach(([r,w,a,blur]) => {
+      ctx.lineWidth = w; ctx.globalAlpha = a; ctx.shadowBlur = blur;
+      ctx.beginPath(); ctx.arc(CX,CY,r,0,Math.PI*2); ctx.stroke();
+    });
+
+    // 12 major spokes — alternating diamond / circle tips
+    ctx.globalAlpha = 0.78; ctx.lineWidth = 1.5; ctx.shadowBlur = 12;
+    for (let s = 0; s < 12; s++) {
+      const a = (s/12)*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(CX+Math.cos(a)*R*0.18, CY+Math.sin(a)*R*0.18);
+      ctx.lineTo(CX+Math.cos(a)*R,      CY+Math.sin(a)*R);
+      ctx.stroke();
+      if (s%2 === 0) {
+        ctx.save();
+        ctx.translate(CX+Math.cos(a)*(R+13), CY+Math.sin(a)*(R+13));
+        ctx.rotate(a+Math.PI/4); ctx.globalAlpha = 0.7; ctx.lineWidth = 1.2;
+        ctx.strokeRect(-6,-6,12,12); ctx.restore();
+        ctx.globalAlpha = 0.78; ctx.lineWidth = 1.5;
+      } else {
+        ctx.beginPath();
+        ctx.arc(CX+Math.cos(a)*(R+11), CY+Math.sin(a)*(R+11), 4.5, 0, Math.PI*2);
+        ctx.stroke();
+      }
+    }
+
+    // 6 minor half-spokes (inner rings only)
+    ctx.globalAlpha = 0.35; ctx.lineWidth = 0.8; ctx.shadowBlur = 5;
+    for (let s = 0; s < 6; s++) {
+      const a = (s/6)*Math.PI*2 + Math.PI/12;
+      ctx.beginPath();
+      ctx.moveTo(CX+Math.cos(a)*R*0.18, CY+Math.sin(a)*R*0.18);
+      ctx.lineTo(CX+Math.cos(a)*R*0.53, CY+Math.sin(a)*R*0.53);
+      ctx.stroke();
+    }
+
+    // Alternating arc fillets between outer two rings
+    ctx.globalAlpha = 0.3; ctx.lineWidth = 1; ctx.shadowBlur = 4;
+    for (let s = 0; s < 12; s += 2) {
+      ctx.beginPath();
+      ctx.arc(CX,CY,R*0.87, (s/12)*Math.PI*2, ((s+1)/12)*Math.PI*2);
+      ctx.stroke();
+    }
+
+    // Hexagram (two overlapping triangles — Star of David)
+    ctx.globalAlpha = 0.88; ctx.lineWidth = 1.5; ctx.shadowBlur = 14;
+    for (let t = 0; t < 2; t++) {
+      ctx.beginPath();
+      for (let v = 0; v < 3; v++) {
+        const a = (v/3)*Math.PI*2 + t*(Math.PI/3) - Math.PI/2;
+        v === 0 ? ctx.moveTo(CX+Math.cos(a)*R*0.37, CY+Math.sin(a)*R*0.37)
+                : ctx.lineTo(CX+Math.cos(a)*R*0.37, CY+Math.sin(a)*R*0.37);
+      }
+      ctx.closePath(); ctx.stroke();
+    }
+
+    // Pentagram inscribed inside hexagram
+    ctx.globalAlpha = 0.62; ctx.lineWidth = 1.2; ctx.shadowBlur = 10;
+    ctx.beginPath();
+    for (let v = 0; v < 5; v++) {
+      const a = ((v*2)/5)*Math.PI*2 - Math.PI/2;
+      v === 0 ? ctx.moveTo(CX+Math.cos(a)*R*0.22, CY+Math.sin(a)*R*0.22)
+              : ctx.lineTo(CX+Math.cos(a)*R*0.22, CY+Math.sin(a)*R*0.22);
+    }
+    ctx.closePath(); ctx.stroke();
+
+    // 12 runes orbiting between ring 2 and ring 3
+    for (let i = 0; i < 12; i++) {
+      const a = (i/12)*Math.PI*2;
       ctx.save();
-      ctx.translate(W / 2, dy);
-      ctx.rotate(Math.PI / 4);
-      ctx.strokeRect(-7, -7, 14, 14);
+      ctx.translate(CX+Math.cos(a)*R*0.635, CY+Math.sin(a)*R*0.635);
+      ctx.rotate(a+Math.PI/2);
+      ctx.font = '19px serif'; ctx.globalAlpha = 0.62; ctx.shadowBlur = 9;
+      ctx.fillText(RUNES[(i*2+5+idx) % RUNES.length], 0, 0);
       ctx.restore();
     }
 
-    // Central sigil circle + spokes in each section
-    const runes = ['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ',
-                   'ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ'];
-    for (let s = 0; s < sections; s++) {
-      const cy = (H / sections) * s + H / (sections * 2);
-      const cx = W / 2;
-      const R  = 62;
-      ctx.shadowBlur = 10; ctx.lineWidth = 2;
-      // Outer ring
-      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.stroke();
-      // Inner ring
-      ctx.beginPath(); ctx.arc(cx, cy, R * 0.55, 0, Math.PI * 2); ctx.stroke();
-      // Spokes (hex or oct alternating)
-      const spokes = s % 2 === 0 ? 6 : 8;
-      for (let sp = 0; sp < spokes; sp++) {
-        const a = (sp / spokes) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx + Math.cos(a) * R * 0.55, cy + Math.sin(a) * R * 0.55);
-        ctx.lineTo(cx + Math.cos(a) * R,         cy + Math.sin(a) * R);
-        ctx.stroke();
-      }
-      // Inscribed triangle
+    // 16 runes orbiting just outside the outer circle
+    for (let i = 0; i < 16; i++) {
+      const a = (i/16)*Math.PI*2;
+      ctx.save();
+      ctx.translate(CX+Math.cos(a)*R*1.10, CY+Math.sin(a)*R*1.10);
+      ctx.rotate(a+Math.PI/2);
+      ctx.font = '16px serif'; ctx.globalAlpha = 0.45; ctx.shadowBlur = 7;
+      ctx.fillText(RUNES[(i*3+11+idx) % RUNES.length], 0, 0);
+      ctx.restore();
+    }
+    ctx.globalAlpha = 1;
+
+    // Central focal rune (unique per pillar via idx)
+    ctx.font = '80px serif'; ctx.globalAlpha = 1.0; ctx.shadowBlur = 28;
+    ctx.fillText(RUNES[(idx*5+18) % RUNES.length], CX, CY);
+
+    // ── Top sub-ornament: 8-spoke star wheel ─────────────────────
+    const TOP_Y = 116, TOP_R = 68;
+    ctx.globalAlpha = 0.82; ctx.lineWidth = 1.5; ctx.shadowBlur = 12;
+    [TOP_R, TOP_R*0.60, TOP_R*0.34].forEach(r => {
+      ctx.beginPath(); ctx.arc(CX,TOP_Y,r,0,Math.PI*2); ctx.stroke();
+    });
+    ctx.globalAlpha = 0.68; ctx.lineWidth = 1; ctx.shadowBlur = 8;
+    for (let s = 0; s < 8; s++) {
+      const a = (s/8)*Math.PI*2;
       ctx.beginPath();
-      for (let v = 0; v < 3; v++) {
-        const a = (v / 3) * Math.PI * 2 - Math.PI / 2;
-        const px = cx + Math.cos(a) * R * 0.42;
-        const py = cy + Math.sin(a) * R * 0.42;
-        v === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      ctx.moveTo(CX+Math.cos(a)*TOP_R*0.34, TOP_Y+Math.sin(a)*TOP_R*0.34);
+      ctx.lineTo(CX+Math.cos(a)*TOP_R,       TOP_Y+Math.sin(a)*TOP_R);
+      ctx.stroke();
+    }
+    ctx.beginPath(); // inscribed square
+    for (let v = 0; v < 4; v++) {
+      const a = (v/4)*Math.PI*2 - Math.PI/4;
+      v === 0 ? ctx.moveTo(CX+Math.cos(a)*TOP_R*0.30, TOP_Y+Math.sin(a)*TOP_R*0.30)
+              : ctx.lineTo(CX+Math.cos(a)*TOP_R*0.30, TOP_Y+Math.sin(a)*TOP_R*0.30);
+    }
+    ctx.closePath(); ctx.stroke();
+    for (let i = 0; i < 8; i++) { // 8 mini runes on middle ring
+      const a = (i/8)*Math.PI*2;
+      ctx.save();
+      ctx.translate(CX+Math.cos(a)*TOP_R*0.47, TOP_Y+Math.sin(a)*TOP_R*0.47);
+      ctx.rotate(a+Math.PI/2); ctx.font = '11px serif'; ctx.globalAlpha = 0.55; ctx.shadowBlur = 6;
+      ctx.fillText(RUNES[(i+idx*2) % RUNES.length], 0, 0); ctx.restore();
+    }
+    ctx.font = '32px serif'; ctx.globalAlpha = 0.95; ctx.shadowBlur = 18;
+    ctx.fillText(RUNES[(idx*3) % RUNES.length], CX, TOP_Y);
+
+    // ── Bottom sub-ornament: 6-spoke rune wheel ───────────────────
+    const BOT_Y = H-116, BOT_R = 68;
+    ctx.globalAlpha = 0.82; ctx.lineWidth = 1.5; ctx.shadowBlur = 12;
+    [BOT_R, BOT_R*0.60, BOT_R*0.34].forEach(r => {
+      ctx.beginPath(); ctx.arc(CX,BOT_Y,r,0,Math.PI*2); ctx.stroke();
+    });
+    ctx.globalAlpha = 0.65; ctx.lineWidth = 1; ctx.shadowBlur = 8;
+    for (let s = 0; s < 6; s++) {
+      const a = (s/6)*Math.PI*2;
+      ctx.beginPath();
+      ctx.moveTo(CX+Math.cos(a)*BOT_R*0.34, BOT_Y+Math.sin(a)*BOT_R*0.34);
+      ctx.lineTo(CX+Math.cos(a)*BOT_R,       BOT_Y+Math.sin(a)*BOT_R);
+      ctx.stroke();
+    }
+    ctx.beginPath(); // inscribed hexagon
+    for (let v = 0; v < 6; v++) {
+      const a = (v/6)*Math.PI*2 - Math.PI/6;
+      v === 0 ? ctx.moveTo(CX+Math.cos(a)*BOT_R*0.30, BOT_Y+Math.sin(a)*BOT_R*0.30)
+              : ctx.lineTo(CX+Math.cos(a)*BOT_R*0.30, BOT_Y+Math.sin(a)*BOT_R*0.30);
+    }
+    ctx.closePath(); ctx.stroke();
+    for (let i = 0; i < 6; i++) { // 6 mini runes on middle ring
+      const a = (i/6)*Math.PI*2;
+      ctx.save();
+      ctx.translate(CX+Math.cos(a)*BOT_R*0.47, BOT_Y+Math.sin(a)*BOT_R*0.47);
+      ctx.rotate(a+Math.PI/2); ctx.font = '11px serif'; ctx.globalAlpha = 0.55; ctx.shadowBlur = 6;
+      ctx.fillText(RUNES[(i+6+idx*4) % RUNES.length], 0, 0); ctx.restore();
+    }
+    ctx.font = '28px serif'; ctx.globalAlpha = 0.92; ctx.shadowBlur = 16;
+    ctx.fillText(RUNES[(idx*7+14) % RUNES.length], CX, BOT_Y);
+    ctx.globalAlpha = 1;
+
+    // ── Vertical spine connecting all three focal elements ────────
+    ctx.lineWidth = 1; ctx.globalAlpha = 0.4; ctx.shadowBlur = 6;
+    ctx.beginPath(); ctx.moveTo(CX, TOP_Y+TOP_R+2); ctx.lineTo(CX, CY-R); ctx.stroke();
+    for (let ty = TOP_Y+TOP_R+14; ty < CY-R-4; ty += 14) {
+      ctx.beginPath(); ctx.moveTo(CX-5,ty); ctx.lineTo(CX+5,ty); ctx.stroke();
+    }
+    ctx.beginPath(); ctx.moveTo(CX, CY+R); ctx.lineTo(CX, BOT_Y-BOT_R-2); ctx.stroke();
+    for (let ty = CY+R+14; ty < BOT_Y-BOT_R-4; ty += 14) {
+      ctx.beginPath(); ctx.moveTo(CX-5,ty); ctx.lineTo(CX+5,ty); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // ── Side circuit lines (angular paths with node dots) ─────────
+    ctx.lineWidth = 1; ctx.globalAlpha = 0.42; ctx.shadowBlur = 7;
+    [[54,96],[W-54,W-96]].forEach(([xA,xB]) => {
+      ctx.beginPath();
+      ctx.moveTo(xA,158); ctx.lineTo(xB,232); ctx.lineTo(xB,CY-90);
+      ctx.lineTo(xA,CY); ctx.lineTo(xB,CY+90);
+      ctx.lineTo(xB,H-232); ctx.lineTo(xA,H-158);
+      ctx.stroke();
+      [[xA,158],[xB,232],[xB,CY-90],[xA,CY],[xB,CY+90],[xB,H-232],[xA,H-158]].forEach(([px,py]) => {
+        ctx.globalAlpha = 0.62; ctx.beginPath(); ctx.arc(px,py,4.5,0,Math.PI*2); ctx.fill();
+      });
+      ctx.globalAlpha = 0.42;
+    });
+    ctx.globalAlpha = 1;
+
+    // ── Scattered rune clusters unique per pillar ─────────────────
+    ctx.shadowBlur = 8;
+    [
+      {x1:108, x2:230, y1:170, y2:H-170, n:20, off:1},
+      {x1:W-230, x2:W-108, y1:170, y2:H-170, n:20, off:9},
+      {x1:135, x2:440, y1:TOP_Y+TOP_R+8, y2:CY-R-8, n:7, off:17},
+      {x1:584, x2:889, y1:TOP_Y+TOP_R+8, y2:CY-R-8, n:7, off:20},
+      {x1:135, x2:440, y1:CY+R+8, y2:BOT_Y-BOT_R-8, n:7, off:3},
+      {x1:584, x2:889, y1:CY+R+8, y2:BOT_Y-BOT_R-8, n:7, off:7},
+    ].forEach(({x1,x2,y1,y2,n,off}) => {
+      if (x2 <= x1+8 || y2 <= y1+8) return;
+      for (let j = 0; j < n; j++) {
+        const rx = x1 + rand()*(x2-x1), ry = y1 + rand()*(y2-y1);
+        ctx.font = `${13+Math.floor(rand()*18)}px serif`;
+        ctx.globalAlpha = 0.2 + rand()*0.5;
+        ctx.save(); ctx.translate(rx,ry); ctx.rotate((rand()-0.5)*0.5);
+        ctx.fillText(RUNES[(off+j+idx*3) % RUNES.length], 0, 0);
+        ctx.restore();
       }
-      ctx.closePath(); ctx.stroke();
-      // Center rune glyph
-      ctx.shadowBlur = 14; ctx.font = '34px serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.globalAlpha = 0.95;
-      ctx.fillText(runes[(s * 6) % runes.length], cx, cy);
-      ctx.globalAlpha = 1;
-    }
-
-    // Scattered rune field across surface
-    ctx.shadowBlur = 10; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    for (let i = 0; i < 90; i++) {
-      const rx = 26 + rand() * (W - 52);
-      const ry = 26 + rand() * (H - 52);
-      ctx.globalAlpha = 0.35 + rand() * 0.55;
-      ctx.font = `${16 + Math.floor(rand() * 18)}px serif`;
-      ctx.fillText(runes[i % runes.length], rx, ry);
-    }
+    });
     ctx.globalAlpha = 1;
 
-    // Vertical rune columns along both edges
-    ctx.font = '20px serif'; ctx.shadowBlur = 8;
-    for (let row = 0; row < 22; row++) {
-      const ry = 28 + row * (H - 56) / 21;
-      ctx.globalAlpha = 0.65;
-      ctx.fillText(runes[(row * 3)     % runes.length], 24,     ry);
-      ctx.fillText(runes[(row * 5 + 9) % runes.length], W - 24, ry);
-    }
+    // ── Horizontal accent lines flanking sub-mandalas ─────────────
+    ctx.lineWidth = 1; ctx.shadowBlur = 5;
+    [[TOP_Y,TOP_R+6],[BOT_Y,BOT_R+6]].forEach(([ly,clr]) => {
+      ctx.globalAlpha = 0.42;
+      ctx.beginPath(); ctx.moveTo(50,ly); ctx.lineTo(CX-clr,ly); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(CX+clr,ly); ctx.lineTo(W-50,ly); ctx.stroke();
+      for (let t = 0; t < 5; t++) {
+        const tx = 56 + t*(CX-clr-58)/4;
+        ctx.beginPath(); ctx.moveTo(tx,ly-5); ctx.lineTo(tx,ly+5); ctx.stroke();
+      }
+    });
     ctx.globalAlpha = 1;
 
-    // Thin diagonal accent lines on the sides
-    ctx.lineWidth = 1; ctx.shadowBlur = 4;
-    for (let i = 0; i < 7; i++) {
-      const y1 = 20  + i * (H - 40) / 6;
-      const y2 = 20  + (i + 1) * (H - 40) / 6;
-      ctx.globalAlpha = 0.28;
-      ctx.beginPath(); ctx.moveTo(20, y1); ctx.lineTo(W / 2 - 70, y2); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(W - 20, y1); ctx.lineTo(W / 2 + 70, y2); ctx.stroke();
+    // ── Constellation accent dots ─────────────────────────────────
+    ctx.shadowBlur = 4;
+    for (let i = 0; i < 70; i++) {
+      const dx = 52+rand()*(W-104), dy = 52+rand()*(H-104);
+      if (Math.hypot(dx-CX,dy-CY) < R+36) continue;
+      if (Math.hypot(dx-CX,dy-TOP_Y) < TOP_R+14) continue;
+      if (Math.hypot(dx-CX,dy-BOT_Y) < BOT_R+14) continue;
+      ctx.globalAlpha = 0.16+rand()*0.36;
+      ctx.beginPath(); ctx.arc(dx,dy,1+rand()*2.5,0,Math.PI*2); ctx.fill();
     }
     ctx.globalAlpha = 1;
 
@@ -309,7 +491,7 @@ import * as THREE from 'three';
     group.add(pad);
 
     // Rune-engraved glowing pillar
-    const runeTex = makeRuneTexture(color);
+    const runeTex = makeRuneTexture(color, i);
     const pillar = new THREE.Mesh(
       new THREE.CylinderGeometry(0.9, 1.1, 5, 6),
       new THREE.MeshStandardMaterial({
