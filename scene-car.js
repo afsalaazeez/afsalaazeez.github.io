@@ -1036,16 +1036,19 @@ import * as THREE from 'three';
   slab(car, 1.0, 0.08, 0.12, new THREE.MeshBasicMaterial({ color: 0xffffff }), 0, 2.02, 0.42, false);
 
   // ---- RC rock crawler body ----
-  // Silver polycarbonate side panels — slightly proud so they read from the side
-  [-0.74, 0.74].forEach((sx) => slab(car, 0.10, 0.72, 2.2, bodyMat, sx, 1.0, -0.1));
-  // Rear body panel — fire logo emissive plate facing the chase camera
+  // Fire logo emissive material — shared across rear, front, and side body panels
   fireLogoMat = new THREE.MeshStandardMaterial({
     color: 0xd0d8e0, metalness: 0.22, roughness: 0.55,
     emissive: new THREE.Color(0xffffff),
     emissiveIntensity: 0.9,
     emissiveMap: makeFireLogoTexture(),
   });
+  // Side panels — fire logo glows on the outward-facing face
+  [-0.74, 0.74].forEach((sx) => slab(car, 0.10, 0.72, 2.2, fireLogoMat, sx, 1.0, -0.1));
+  // Rear body panel — fire logo facing the chase camera
   slab(car, 1.44, 0.70, 0.08, fireLogoMat, 0, 1.05, -1.80);
+  // Front body panel — fire logo facing forward
+  slab(car, 1.44, 0.70, 0.08, fireLogoMat, 0, 1.05, 1.80);
   // Flat roof panel
   slab(car, 1.44, 0.07, 1.45, bodyMat, 0, 1.86, -0.1);
   // Angled windscreen panel
