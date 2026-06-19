@@ -766,6 +766,125 @@ import * as THREE from 'three';
   scene.add(starPoints);
 
   // ========================================================================
+  // CAR — fire logo texture for rear plate
+  // ========================================================================
+  function makeFireLogoTexture() {
+    const W = 512, H = 256;
+    const cvs = document.createElement('canvas');
+    cvs.width = W; cvs.height = H;
+    const ctx = cvs.getContext('2d');
+
+    // Warm near-black background
+    ctx.fillStyle = '#050100';
+    ctx.fillRect(0, 0, W, H);
+
+    // Ambient fire glow (radial, centered)
+    const ambG = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, W * 0.44);
+    ambG.addColorStop(0,   'rgba(255,88,0,0.22)');
+    ambG.addColorStop(0.5, 'rgba(200,28,0,0.09)');
+    ambG.addColorStop(1,   'rgba(160,0,0,0)');
+    ctx.fillStyle = ambG;
+    ctx.fillRect(0, 0, W, H);
+
+    // Rising flame wave lines at the bottom
+    for (let ly = 0; ly < 6; ly++) {
+      const baseY = H * 0.74 + ly * 7;
+      const amp   = 7 - ly;
+      const freq  = (2.2 + ly * 0.5) * Math.PI * 2 / W;
+      const gv    = Math.round(ly * 22);
+      ctx.strokeStyle = `rgba(255,${gv},0,${0.75 - ly * 0.1})`;
+      ctx.lineWidth   = 2.5 - ly * 0.28;
+      ctx.shadowColor = `rgba(255,${gv},0,1)`;
+      ctx.shadowBlur  = 9;
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 2) {
+        const y = baseY + Math.sin(x * freq + ly * 1.8) * amp;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    ctx.shadowBlur = 0;
+
+    // Side wavy streaks radiating outward from logo
+    [-1, 1].forEach(side => {
+      const x0 = W/2 + side * 110;
+      const x1 = W/2 + side * (W/2 - 22);
+      for (let row = 0; row < 5; row++) {
+        const y0 = H/2 - 32 + row * 14;
+        const gv = 55 + row * 28;
+        ctx.strokeStyle = `rgba(255,${gv},0,${0.68 - row * 0.1})`;
+        ctx.lineWidth   = 2.2 - row * 0.3;
+        ctx.shadowColor = `rgba(255,${gv},0,0.9)`;
+        ctx.shadowBlur  = 7;
+        ctx.beginPath();
+        for (let i = 0; i <= 40; i++) {
+          const ft = i / 40;
+          const x = x0 + (x1 - x0) * ft;
+          const y = y0 + Math.sin(ft * Math.PI * 3.5 + row * 1.3) * 5;
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    });
+    ctx.shadowBlur = 0;
+
+    // AA logo — scaled into fire gradient in local SVG coordinate space
+    const SC   = 3.75;
+    const offX = W/2 - 24 * SC;
+    const offY = (H - 48 * SC) / 2 - 8; // slightly above center to leave room for text
+
+    ctx.save();
+    ctx.translate(offX, offY);
+    ctx.scale(SC, SC);
+
+    const fireG = ctx.createLinearGradient(4, 2, 44, 46);
+    fireG.addColorStop(0,    '#ffee00');
+    fireG.addColorStop(0.35, '#ff8800');
+    fireG.addColorStop(0.72, '#ff2200');
+    fireG.addColorStop(1,    '#cc0000');
+
+    // Hexagonal border
+    ctx.shadowColor = '#ff6600'; ctx.shadowBlur = 5;
+    ctx.strokeStyle = fireG; ctx.lineWidth = 2; ctx.globalAlpha = 0.82;
+    ctx.beginPath();
+    [[24,2],[44,13],[44,35],[24,46],[4,35],[4,13]].forEach(([px,py],vi) =>
+      vi===0 ? ctx.moveTo(px,py) : ctx.lineTo(px,py));
+    ctx.closePath(); ctx.stroke();
+
+    // Two A shapes
+    ctx.shadowBlur = 3.5; ctx.fillStyle = fireG; ctx.globalAlpha = 1.0;
+    ctx.fill(new Path2D('M10 36 L18 12 L22 12 L16 36 L13 36 L19.5 18.5 L17 18.5 Z'));
+    ctx.fill(new Path2D('M26 36 L34 12 L38 12 L32 36 L29 36 L35.5 18.5 L33 18.5 Z'));
+
+    // Crossbar connecting both As (rounded rect)
+    ctx.globalAlpha = 0.88;
+    const [bx,by,bw,bh,br] = [14, 25, 22, 2.5, 1.25];
+    ctx.beginPath();
+    ctx.moveTo(bx+br, by);
+    ctx.lineTo(bx+bw-br, by);       ctx.arcTo(bx+bw, by,   bx+bw, by+br,   br);
+    ctx.lineTo(bx+bw, by+bh-br);    ctx.arcTo(bx+bw, by+bh, bx+bw-br, by+bh, br);
+    ctx.lineTo(bx+br, by+bh);       ctx.arcTo(bx, by+bh, bx, by+bh-br, br);
+    ctx.lineTo(bx, by+br);          ctx.arcTo(bx, by, bx+br, by, br);
+    ctx.closePath(); ctx.fill();
+
+    ctx.restore(); ctx.shadowBlur = 0;
+
+    // "AFSAL A AZEEZ" name text
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold 16px monospace';
+    ctx.shadowColor = '#ff4400'; ctx.shadowBlur = 8;
+    ctx.fillStyle = 'rgba(255,128,18,0.72)'; ctx.globalAlpha = 1;
+    ctx.fillText('AFSAL  A  AZEEZ', W/2, H - 18);
+    ctx.shadowBlur = 0;
+
+    const tex = new THREE.CanvasTexture(cvs);
+    tex.anisotropy = 4;
+    return tex;
+  }
+
+  let fireLogoMat = null; // referenced in tick for flicker animation
+
+  // ========================================================================
   // CAR
   // ========================================================================
   // RC rock crawler: red metal tube cage, silver polycarbonate body panels,
@@ -919,8 +1038,14 @@ import * as THREE from 'three';
   // ---- RC rock crawler body ----
   // Silver polycarbonate side panels — slightly proud so they read from the side
   [-0.74, 0.74].forEach((sx) => slab(car, 0.10, 0.72, 2.2, bodyMat, sx, 1.0, -0.1));
-  // Rear body panel — faces the chase camera directly
-  slab(car, 1.44, 0.70, 0.08, bodyMat, 0, 1.05, -1.80);
+  // Rear body panel — fire logo emissive plate facing the chase camera
+  fireLogoMat = new THREE.MeshStandardMaterial({
+    color: 0xd0d8e0, metalness: 0.22, roughness: 0.55,
+    emissive: new THREE.Color(0xffffff),
+    emissiveIntensity: 0.9,
+    emissiveMap: makeFireLogoTexture(),
+  });
+  slab(car, 1.44, 0.70, 0.08, fireLogoMat, 0, 1.05, -1.80);
   // Flat roof panel
   slab(car, 1.44, 0.07, 1.45, bodyMat, 0, 1.86, -0.1);
   // Angled windscreen panel
@@ -1276,6 +1401,10 @@ import * as THREE from 'three';
         k.sparkles.material.opacity = 0.6 + Math.sin(t * 2.1 + i) * 0.25;
       });
       plaza.rotation.z = t * 0.2;
+      // Fire logo flicker on rear plate
+      if (fireLogoMat) {
+        fireLogoMat.emissiveIntensity = 0.80 + Math.sin(t * 4.3) * 0.18 + Math.sin(t * 7.1) * 0.08;
+      }
     }
 
     // --- Animate chickens ---
