@@ -1285,7 +1285,7 @@ import * as THREE from 'three';
   }
   window.addEventListener('themechange', (e) => applyTheme(e.detail.theme !== 'light'));
   // Apply on load in case user had light mode saved
-  applyTheme(document.documentElement.getAttribute('data-theme') !== 'light');
+  applyTheme(localStorage.getItem('theme') !== 'light');
 
   // Height sampler — exact mirror of the terrain geometry displacement formula
   function getTerrainHeight(x, z) {
