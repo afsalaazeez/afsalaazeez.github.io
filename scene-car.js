@@ -11,6 +11,7 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 (function initCarWorld() {
   const canvas = document.getElementById('world');
@@ -684,13 +685,13 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       const group = new THREE.Group();
 
       // Body
-      const body = new THREE.Mesh(new THREE.BoxGeometry(0.8 * CS, bodyH, 1.05 * CS), cWhiteMat);
+      const body = new THREE.Mesh(new RoundedBoxGeometry(0.8 * CS, bodyH, 1.05 * CS, 4, 0.08 * CS), cWhiteMat);
       body.position.set(0, bodyCenter, 0);
       body.castShadow = true;
       group.add(body);
 
       // Tail feathers
-      const tail = new THREE.Mesh(new THREE.BoxGeometry(0.55 * CS, 0.42 * CS, 0.20 * CS), cWhiteMat);
+      const tail = new THREE.Mesh(new RoundedBoxGeometry(0.55 * CS, 0.42 * CS, 0.20 * CS, 4, 0.04 * CS), cWhiteMat);
       tail.position.set(0, bodyTop - 0.08 * CS, -0.58 * CS);
       tail.rotation.x = 0.55;
       group.add(tail);
@@ -699,24 +700,24 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       const headGroup = new THREE.Group();
       headGroup.position.set(0, headBaseY, 0.36 * CS);
 
-      const headMesh = new THREE.Mesh(new THREE.BoxGeometry(0.55 * CS, 0.55 * CS, 0.55 * CS), cWhiteMat);
+      const headMesh = new THREE.Mesh(new RoundedBoxGeometry(0.55 * CS, 0.55 * CS, 0.55 * CS, 4, 0.07 * CS), cWhiteMat);
       headMesh.castShadow = true;
       headGroup.add(headMesh);
 
-      const beak = new THREE.Mesh(new THREE.BoxGeometry(0.16 * CS, 0.12 * CS, 0.22 * CS), cOrangeMat);
+      const beak = new THREE.Mesh(new RoundedBoxGeometry(0.16 * CS, 0.12 * CS, 0.22 * CS, 3, 0.02 * CS), cOrangeMat);
       beak.position.set(0, -0.06 * CS, 0.38 * CS);
       headGroup.add(beak);
 
-      const comb = new THREE.Mesh(new THREE.BoxGeometry(0.10 * CS, 0.22 * CS, 0.34 * CS), cRedMat);
+      const comb = new THREE.Mesh(new RoundedBoxGeometry(0.10 * CS, 0.22 * CS, 0.34 * CS, 3, 0.02 * CS), cRedMat);
       comb.position.set(0, 0.37 * CS, 0.04 * CS);
       headGroup.add(comb);
 
-      const wattle = new THREE.Mesh(new THREE.BoxGeometry(0.10 * CS, 0.18 * CS, 0.10 * CS), cRedMat);
+      const wattle = new THREE.Mesh(new RoundedBoxGeometry(0.10 * CS, 0.18 * CS, 0.10 * CS, 3, 0.02 * CS), cRedMat);
       wattle.position.set(0, -0.25 * CS, 0.22 * CS);
       headGroup.add(wattle);
 
       [-1, 1].forEach((side) => {
-        const eye = new THREE.Mesh(new THREE.BoxGeometry(0.05 * CS, 0.09 * CS, 0.05 * CS), cEyeMat);
+        const eye = new THREE.Mesh(new RoundedBoxGeometry(0.05 * CS, 0.09 * CS, 0.05 * CS, 2, 0.01 * CS), cEyeMat);
         eye.position.set(side * 0.28 * CS, 0.04 * CS, 0.28 * CS);
         headGroup.add(eye);
       });
@@ -725,14 +726,14 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       // Wings — pivot at shoulder so they flap when fleeing
       const leftWingPivot  = new THREE.Group();
       leftWingPivot.position.set(-0.42 * CS, bodyCenter + 0.10 * CS, 0);
-      const lwm = new THREE.Mesh(new THREE.BoxGeometry(0.14 * CS, 0.52 * CS, 0.88 * CS), cWingMat);
+      const lwm = new THREE.Mesh(new RoundedBoxGeometry(0.14 * CS, 0.52 * CS, 0.88 * CS, 3, 0.03 * CS), cWingMat);
       lwm.position.y = -0.26 * CS;
       leftWingPivot.add(lwm);
       group.add(leftWingPivot);
 
       const rightWingPivot = new THREE.Group();
       rightWingPivot.position.set(0.42 * CS, bodyCenter + 0.10 * CS, 0);
-      const rwm = new THREE.Mesh(new THREE.BoxGeometry(0.14 * CS, 0.52 * CS, 0.88 * CS), cWingMat);
+      const rwm = new THREE.Mesh(new RoundedBoxGeometry(0.14 * CS, 0.52 * CS, 0.88 * CS, 3, 0.03 * CS), cWingMat);
       rwm.position.y = -0.26 * CS;
       rightWingPivot.add(rwm);
       group.add(rightWingPivot);
@@ -740,20 +741,20 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       // Legs — pivot at hip for striding
       const leftLegPivot = new THREE.Group();
       leftLegPivot.position.set(-0.18 * CS, bodyBottom, 0.08 * CS);
-      const llm = new THREE.Mesh(new THREE.BoxGeometry(0.13 * CS, legLen, 0.13 * CS), cOrangeMat);
+      const llm = new THREE.Mesh(new RoundedBoxGeometry(0.13 * CS, legLen, 0.13 * CS, 3, 0.02 * CS), cOrangeMat);
       llm.position.y = -legLen / 2;
       leftLegPivot.add(llm);
-      const lf = new THREE.Mesh(new THREE.BoxGeometry(0.32 * CS, 0.06 * CS, 0.22 * CS), cOrangeMat);
+      const lf = new THREE.Mesh(new RoundedBoxGeometry(0.32 * CS, 0.06 * CS, 0.22 * CS, 3, 0.01 * CS), cOrangeMat);
       lf.position.set(0.04 * CS, -legLen, 0.07 * CS);
       leftLegPivot.add(lf);
       group.add(leftLegPivot);
 
       const rightLegPivot = new THREE.Group();
       rightLegPivot.position.set(0.18 * CS, bodyBottom, 0.08 * CS);
-      const rlm = new THREE.Mesh(new THREE.BoxGeometry(0.13 * CS, legLen, 0.13 * CS), cOrangeMat);
+      const rlm = new THREE.Mesh(new RoundedBoxGeometry(0.13 * CS, legLen, 0.13 * CS, 3, 0.02 * CS), cOrangeMat);
       rlm.position.y = -legLen / 2;
       rightLegPivot.add(rlm);
-      const rf = new THREE.Mesh(new THREE.BoxGeometry(0.32 * CS, 0.06 * CS, 0.22 * CS), cOrangeMat);
+      const rf = new THREE.Mesh(new RoundedBoxGeometry(0.32 * CS, 0.06 * CS, 0.22 * CS, 3, 0.01 * CS), cOrangeMat);
       rf.position.set(0.04 * CS, -legLen, 0.07 * CS);
       rightLegPivot.add(rf);
       group.add(rightLegPivot);
@@ -920,6 +921,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   }
 
   let fireLogoMat = null; // referenced in tick for flicker animation
+  let accentMat = null;   // emissive accent strips — referenced in tick for pulse
 
   // ========================================================================
   // CAR
@@ -940,7 +942,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   const boltMat     = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8,  roughness: 0.35 });
   const beadlockMat = new THREE.MeshStandardMaterial({ color: 0xcc0000, metalness: 0.7,  roughness: 0.30 }); // red beadlock ring
   const seatMat     = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.1,  roughness: 0.90 });
-  const bodyMat     = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 0.22, roughness: 0.55 }); // silver polycarbonate
+  const bodyMat     = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 0.6, roughness: 0.3 });
 
   const UPV = new THREE.Vector3(0, 1, 0);
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpD = new THREE.Vector3();
@@ -957,7 +959,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     return m;
   }
   function slab(parent, w, h, d, mat, x, y, z, cast = true) {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    const chamfer = Math.min(w, h, d) * 0.18;
+    const m = new THREE.Mesh(new RoundedBoxGeometry(w, h, d, 4, chamfer), mat);
     m.position.set(x, y, z); m.castShadow = cast; parent.add(m); return m;
   }
   function drum(parent, rt, rb, h, mat, x, y, z, axis, cast = true) {
@@ -1086,14 +1089,139 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   slab(car, 1.44, 0.70, 0.08, fireLogoMat, 0, 1.05, -1.80);
   // Front body panel — fire logo facing forward
   slab(car, 1.44, 0.70, 0.08, fireLogoMat, 0, 1.05, 1.80);
+
+  // ---- Hood panel — bridges front body panel top to windshield base ----
+  // Front panel top edge: y ≈ 1.40, z = 1.76
+  // Windshield base (after rotation): y ≈ 1.36, z ≈ 0.53
+  // Hood spans between these, slightly angled to slope down toward the front
+  const hoodLen = 1.24;   // z span from windshield base to front panel
+  const hoodPanel = new THREE.Mesh(
+    new RoundedBoxGeometry(1.44, 0.07, hoodLen, 4, 0.012),
+    bodyMat
+  );
+  hoodPanel.position.set(0, 1.40, 1.16);
+  hoodPanel.rotation.x = 0.04;  // very slight downward slope toward front
+  hoodPanel.castShadow = true;
+  car.add(hoodPanel);
+
+  // ---- Rear deck panel — bridges roof rear to rear body panel ----
+  // Roof back edge: z ≈ -0.825,  Rear panel: z = -1.76
+  const rearDeckLen = 0.96;
+  const rearDeck = new THREE.Mesh(
+    new RoundedBoxGeometry(1.44, 0.07, rearDeckLen, 4, 0.012),
+    bodyMat
+  );
+  rearDeck.position.set(0, 1.40, -1.32);
+  rearDeck.rotation.x = -0.04;
+  rearDeck.castShadow = true;
+  car.add(rearDeck);
+
+  // ---- Side filler panels — close the gap between side panels and front/rear fascia ----
+  // Front quarter panels (side panels end at z ≈ 1.0, front panel at z = 1.76)
+  [-0.74, 0.74].forEach((sx) => {
+    slab(car, 0.10, 0.70, 0.64, bodyMat, sx, 1.05, 1.50);
+  });
+  // Rear quarter panels (side panels end at z ≈ -1.2, rear panel at z = -1.76)
+  [-0.74, 0.74].forEach((sx) => {
+    slab(car, 0.10, 0.70, 0.48, bodyMat, sx, 1.05, -1.56);
+  });
+
   // Flat roof panel
   slab(car, 1.44, 0.07, 1.45, bodyMat, 0, 1.86, -0.1);
-  // Angled windscreen panel
-  const wsPanel = slab(car, 1.4, 0.07, 0.72, bodyMat, 0, 1.54, 0.84);
-  wsPanel.rotation.x = -0.52;
+
+  // ---- A-pillar struts — connect windshield sides to roof corners ----
+  strut(car, [-0.66, 1.36, 0.50], [-0.70, 1.86, 0.62], 0.04, steelMat);
+  strut(car, [0.66, 1.36, 0.50], [0.70, 1.86, 0.62], 0.04, steelMat);
+
+  // Angled windscreen — transparent glass via MeshPhysicalMaterial
+  const windshieldMat = new THREE.MeshPhysicalMaterial({
+    color: 0x88ccff,
+    metalness: 0.0,
+    roughness: 0.05,
+    transmission: 1,
+    transparent: true,
+    opacity: 0.35,
+    thickness: 0.08,
+    ior: 1.5,
+    envMapIntensity: 1.0,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+  });
+  const wsPanel = new THREE.Mesh(
+    new RoundedBoxGeometry(1.44, 0.07, 0.80, 4, 0.012),
+    windshieldMat
+  );
+  wsPanel.position.set(0, 1.62, 0.78);
+  wsPanel.rotation.x = -0.48;
+  wsPanel.castShadow = false;
+  car.add(wsPanel);
+
+  // ---- Rear window glass — matching windshield angle ----
+  const rearWsPanel = new THREE.Mesh(
+    new RoundedBoxGeometry(1.44, 0.07, 0.58, 4, 0.012),
+    windshieldMat
+  );
+  rearWsPanel.position.set(0, 1.62, -0.88);
+  rearWsPanel.rotation.x = 0.42;
+  rearWsPanel.castShadow = false;
+  car.add(rearWsPanel);
+
   // Front & rear bumper bars
   slab(car, 1.3, 0.38, 0.12, steelMat, 0, 0.70, 1.96);
   slab(car, 1.3, 0.38, 0.12, steelMat, 0, 0.70, -1.96);
+
+  // ---- Headlights — emissive spheres + SpotLights on the front bumper ----
+  const headlightMat = new THREE.MeshStandardMaterial({
+    color: 0xfff8e0,
+    emissive: new THREE.Color(0xffeebb),
+    emissiveIntensity: 2.5,
+    roughness: 0.1,
+    metalness: 0.0,
+  });
+  const headlightHousingMat = new THREE.MeshStandardMaterial({
+    color: 0x222222, metalness: 0.85, roughness: 0.25,
+  });
+  [-0.45, 0.45].forEach((sx) => {
+    // Chrome housing ring
+    const housing = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.03, 8, 16), headlightHousingMat);
+    housing.position.set(sx, 0.82, 2.02);
+    housing.rotation.y = 0; // faces forward along +Z
+    car.add(housing);
+
+    // Emissive glass bulb
+    const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.12, 12, 10), headlightMat);
+    bulb.position.set(sx, 0.82, 2.04);
+    car.add(bulb);
+
+    // SpotLight for the forward beam
+    const headSpot = new THREE.SpotLight(0xffeedd, 12, 30, Math.PI / 7, 0.5, 1.5);
+    headSpot.position.set(sx, 0.82, 2.04);
+    // Target sits far ahead of the car
+    const spotTarget = new THREE.Object3D();
+    spotTarget.position.set(sx * 0.3, 0.2, 12);
+    car.add(spotTarget);
+    headSpot.target = spotTarget;
+    car.add(headSpot);
+  });
+
+  // ---- Tail lights — red emissive spheres on the rear bumper ----
+  const taillightMat = new THREE.MeshStandardMaterial({
+    color: 0xff1111,
+    emissive: new THREE.Color(0xff0000),
+    emissiveIntensity: 2.0,
+    roughness: 0.15,
+    metalness: 0.0,
+  });
+  [-0.45, 0.45].forEach((sx) => {
+    const tailBulb = new THREE.Mesh(new THREE.SphereGeometry(0.10, 10, 8), taillightMat);
+    tailBulb.position.set(sx, 0.82, -2.02);
+    car.add(tailBulb);
+
+    // Subtle red glow behind
+    const tailGlow = new THREE.PointLight(0xff2200, 2, 5);
+    tailGlow.position.set(sx, 0.82, -2.10);
+    car.add(tailGlow);
+  });
   // Spare tyre — properly seated flat on the roof rack, center of roof
   const spare = new THREE.Mesh(new THREE.TorusGeometry(0.36, 0.13, 8, 14), tireMat);
   spare.rotation.x = Math.PI / 2;
@@ -1107,9 +1235,20 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   spareBeadlock.position.set(0, 2.06, -0.20);
   car.add(spareBeadlock);
 
-  const underglow = new THREE.PointLight(0xff1100, 4, 6);
-  underglow.position.set(0, 0.35, 0);
-  car.add(underglow);
+  // Emissive accent strips — teal to match portfolio gradient
+  accentMat = new THREE.MeshStandardMaterial({
+    color: 0x000000, roughness: 1, metalness: 0,
+    emissive: new THREE.Color(0xff1100),
+    emissiveIntensity: 1.6,
+  });
+  // Flat underglow strip along the belly of the car
+  slab(car, 1.55, 0.03, 2.1, accentMat, 0, 0.40, -0.10, false);
+  // Thin accent strips along the bottom edge of each side panel
+  [-0.80, 0.80].forEach((sx) => slab(car, 0.04, 0.05, 2.0, accentMat, sx, 0.65, -0.10, false));
+  // PointLight so the glow actually tints the ground and body
+  const underglowLight = new THREE.PointLight(0xff1100, 4, 6);
+  underglowLight.position.set(0, 0.35, 0);
+  car.add(underglowLight);
 
   // ---- Beadlock deep-dish wheels + oversized lugged mud tires ----
   const wheels = [];       // inner pivots that roll (rotation.x)
@@ -1121,7 +1260,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
     [0.73,0.06],[0.70,0.13],[0.58,0.20],[0.40,0.22],[0.34,0.20],
   ].map((p) => new THREE.Vector2(p[0], p[1]));
   const tireGeo = new THREE.LatheGeometry(tireProfile, 26);
-  const lugGeo = new THREE.BoxGeometry(0.18, 0.34, 0.14);
+  const lugGeo = new RoundedBoxGeometry(0.18, 0.34, 0.14, 3, 0.025);
 
   function buildWheel(x, z, steerable) {
     const outer = new THREE.Group();         // steering pivot (rotation.y)
@@ -1456,6 +1595,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       // Fire logo flicker on rear plate
       if (fireLogoMat) {
         fireLogoMat.emissiveIntensity = 0.80 + Math.sin(t * 4.3) * 0.18 + Math.sin(t * 7.1) * 0.08;
+      }
+      // Accent strip pulse
+      if (accentMat) {
+        accentMat.emissiveIntensity = 1.5 + Math.sin(t * 1.8) * 0.35 + Math.sin(t * 4.7) * 0.12;
       }
     }
 

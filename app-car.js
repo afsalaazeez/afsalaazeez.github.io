@@ -91,13 +91,23 @@ function initListView() {
 function initHelpDismiss() {
   const help = document.getElementById('help-overlay');
   const start = document.getElementById('help-start');
+  const listBtn = document.getElementById('help-list');
   if (!help) return;
   const close = () => help.classList.add('hidden');
   start?.addEventListener('click', close);
+  listBtn?.addEventListener('click', () => {
+    close();
+    document.body.classList.add('list-mode');
+  });
   // Auto-dismiss once the user starts driving
   window.addEventListener('keydown', (e) => {
     if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'KeyW', 'KeyA', 'KeyS', 'KeyD'].includes(e.code)) close();
   }, { once: true });
+  // Auto list-mode on touch/mobile — driving is awkward on phones
+  if (navigator.maxTouchPoints > 0) {
+    close();
+    document.body.classList.add('list-mode');
+  }
 }
 
 /* ---------- TYPEWRITER ---------- */
