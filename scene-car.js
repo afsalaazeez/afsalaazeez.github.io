@@ -10,6 +10,7 @@
 */
 
 import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 (function initCarWorld() {
   const canvas = document.getElementById('world');
@@ -67,6 +68,42 @@ import * as THREE from 'three';
     400
   );
   camera.position.set(0, 12, -16);
+
+  // ---- Inspect / orbit mode (press I to toggle) -------------------------
+  const orbitControls = new OrbitControls(camera, canvas);
+  orbitControls.enableDamping = true;
+  orbitControls.dampingFactor = 0.08;
+  orbitControls.enabled = false;
+
+  let inspectMode = false;
+  const inspectHUD = document.createElement('div');
+  inspectHUD.textContent = 'INSPECT MODE — press I to exit';
+  Object.assign(inspectHUD.style, {
+    position: 'fixed', bottom: '80px', left: '50%', transform: 'translateX(-50%)',
+    background: 'rgba(0,0,0,0.65)', color: '#00f2fe', fontFamily: 'monospace',
+    fontSize: '13px', padding: '6px 16px', borderRadius: '20px',
+    border: '1px solid #00f2fe55', letterSpacing: '0.05em',
+    pointerEvents: 'none', display: 'none', zIndex: '9999',
+  });
+  document.body.appendChild(inspectHUD);
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'i' || e.key === 'I') {
+      inspectMode = !inspectMode;
+      orbitControls.enabled = inspectMode;
+      inspectHUD.style.display = inspectMode ? 'block' : 'none';
+      if (inspectMode) {
+        // Centre orbit target on the car
+        orbitControls.target.set(
+          orbitControls.object.position.x,
+          1.2,
+          orbitControls.object.position.z
+        );
+        orbitControls.update();
+      }
+    }
+  });
+  // -----------------------------------------------------------------------
 
   // ========================================================================
   // LIGHTS
@@ -1385,15 +1422,20 @@ import * as THREE from 'three';
     const targetSteer = ((input.left ? 1 : 0) - (input.right ? 1 : 0)) * 0.5;
     steerWheels.forEach((p) => (p.rotation.y += (targetSteer - p.rotation.y) * 0.2));
 
-    // --- Chase camera (tracks car height over terrain) ---
-    camGoal.set(
-      state.x - fx * 9.5,
-      state.y + 6.8,
-      state.z - fz * 9.5
-    );
-    camera.position.lerp(camGoal, 1 - Math.pow(0.0008, dt));
-    camTarget.set(state.x + fx * 3.5, state.y + 1.4, state.z + fz * 3.5);
-    camera.lookAt(camTarget);
+    // --- Camera ---
+    if (inspectMode) {
+      orbitControls.target.set(state.x, state.y + 1.2, state.z);
+      orbitControls.update();
+    } else {
+      camGoal.set(
+        state.x - fx * 9.5,
+        state.y + 6.8,
+        state.z - fz * 9.5
+      );
+      camera.position.lerp(camGoal, 1 - Math.pow(0.0008, dt));
+      camTarget.set(state.x + fx * 3.5, state.y + 1.4, state.z + fz * 3.5);
+      camera.lookAt(camTarget);
+    }
 
     // --- Animate kiosks ---
     const t = clock.getElapsedTime();
