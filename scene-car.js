@@ -920,6 +920,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   }
 
   let fireLogoMat = null; // referenced in tick for flicker animation
+  let accentMat = null;   // emissive accent strips — referenced in tick for pulse
 
   // ========================================================================
   // CAR
@@ -940,7 +941,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   const boltMat     = new THREE.MeshStandardMaterial({ color: 0x555555, metalness: 0.8,  roughness: 0.35 });
   const beadlockMat = new THREE.MeshStandardMaterial({ color: 0xcc0000, metalness: 0.7,  roughness: 0.30 }); // red beadlock ring
   const seatMat     = new THREE.MeshStandardMaterial({ color: 0x0a0a0a, metalness: 0.1,  roughness: 0.90 });
-  const bodyMat     = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 0.22, roughness: 0.55 }); // silver polycarbonate
+  const bodyMat     = new THREE.MeshStandardMaterial({ color: 0xe8e8e8, metalness: 0.6, roughness: 0.3 });
 
   const UPV = new THREE.Vector3(0, 1, 0);
   const tmpA = new THREE.Vector3(), tmpB = new THREE.Vector3(), tmpD = new THREE.Vector3();
@@ -1107,9 +1108,20 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   spareBeadlock.position.set(0, 2.06, -0.20);
   car.add(spareBeadlock);
 
-  const underglow = new THREE.PointLight(0xff1100, 4, 6);
-  underglow.position.set(0, 0.35, 0);
-  car.add(underglow);
+  // Emissive accent strips — teal to match portfolio gradient
+  accentMat = new THREE.MeshStandardMaterial({
+    color: 0x000000, roughness: 1, metalness: 0,
+    emissive: new THREE.Color(0x00f2fe),
+    emissiveIntensity: 1.6,
+  });
+  // Flat underglow strip along the belly of the car
+  slab(car, 1.55, 0.03, 2.1, accentMat, 0, 0.40, -0.10, false);
+  // Thin accent strips along the bottom edge of each side panel
+  [-0.80, 0.80].forEach((sx) => slab(car, 0.04, 0.05, 2.0, accentMat, sx, 0.65, -0.10, false));
+  // PointLight so the glow actually tints the ground and body
+  const underglowLight = new THREE.PointLight(0x00f2fe, 4, 6);
+  underglowLight.position.set(0, 0.35, 0);
+  car.add(underglowLight);
 
   // ---- Beadlock deep-dish wheels + oversized lugged mud tires ----
   const wheels = [];       // inner pivots that roll (rotation.x)
@@ -1456,6 +1468,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
       // Fire logo flicker on rear plate
       if (fireLogoMat) {
         fireLogoMat.emissiveIntensity = 0.80 + Math.sin(t * 4.3) * 0.18 + Math.sin(t * 7.1) * 0.08;
+      }
+      // Accent strip pulse
+      if (accentMat) {
+        accentMat.emissiveIntensity = 1.5 + Math.sin(t * 1.8) * 0.35 + Math.sin(t * 4.7) * 0.12;
       }
     }
 
