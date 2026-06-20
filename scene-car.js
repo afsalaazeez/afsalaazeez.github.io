@@ -1111,7 +1111,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   // Emissive accent strips — teal to match portfolio gradient
   accentMat = new THREE.MeshStandardMaterial({
     color: 0x000000, roughness: 1, metalness: 0,
-    emissive: new THREE.Color(0x00f2fe),
+    emissive: new THREE.Color(0xff1100),
     emissiveIntensity: 1.6,
   });
   // Flat underglow strip along the belly of the car
@@ -1119,7 +1119,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   // Thin accent strips along the bottom edge of each side panel
   [-0.80, 0.80].forEach((sx) => slab(car, 0.04, 0.05, 2.0, accentMat, sx, 0.65, -0.10, false));
   // PointLight so the glow actually tints the ground and body
-  const underglowLight = new THREE.PointLight(0x00f2fe, 4, 6);
+  const underglowLight = new THREE.PointLight(0xff1100, 4, 6);
   underglowLight.position.set(0, 0.35, 0);
   car.add(underglowLight);
 
