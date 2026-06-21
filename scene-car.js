@@ -535,7 +535,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       new THREE.MeshStandardMaterial({
         color: 0x030810,
         emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 1.1,
+        emissiveIntensity: 0.18,
         emissiveMap: runeTex,
         roughness: 0.55,
         metalness: 0.15,
@@ -551,7 +551,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       new THREE.MeshStandardMaterial({
         color,
         emissive: color,
-        emissiveIntensity: 1.1,
+        emissiveIntensity: 0.25,
         roughness: 0.2,
         metalness: 0.4,
       })
@@ -561,7 +561,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     group.add(crystal);
 
     // Beacon light
-    const beam = new THREE.PointLight(color, 18, 18);
+    const beam = new THREE.PointLight(color, 3, 18);
     beam.position.y = 6;
     group.add(beam);
 
