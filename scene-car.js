@@ -601,7 +601,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     group.add(sparkles);
 
     scene.add(group);
-    kioskMeshes.push({ ...k, group, crystal, pring, sparkles, sparkPhase, sparkSpeed, pos: new THREE.Vector3(x, ky, z) });
+    kioskMeshes.push({ ...k, group, pillar, crystal, beam, pring, sparkles, sparkPhase, sparkSpeed, pos: new THREE.Vector3(x, ky, z) });
   });
 
   // --- Score / coin collection ---
@@ -611,7 +611,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
   scoreHUD.innerHTML = `🪙 <span id="score-val">0</span>&thinsp;/&thinsp;<span id="score-max">${kioskMeshes.length}</span>`;
   document.body.appendChild(scoreHUD);
 
-  function awardCoin() {
+  function awardCoin(id) {
     document.getElementById('score-val').textContent = visitedKiosks.size;
     const pop = document.createElement('div');
     pop.className = 'coin-popup';
@@ -623,6 +623,13 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     scoreHUD.classList.add('score-pop');
     if (visitedKiosks.size === kioskMeshes.length)
       setTimeout(() => scoreHUD.classList.add('score-complete'), 400);
+    // Light up the pillar permanently on first visit
+    const km = kioskMeshes.find((m) => m.id === id);
+    if (km) {
+      km.pillar.material.emissiveIntensity = 4.5;
+      km.beam.intensity = 55;
+      km.crystal.material.emissiveIntensity = 2.8;
+    }
   }
 
   // ========================================================================
@@ -1417,7 +1424,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       activeKiosk = newId;
       if (newId && !visitedKiosks.has(newId)) {
         visitedKiosks.add(newId);
-        awardCoin();
+        awardCoin(newId);
       }
       document.querySelectorAll('.info-card').forEach((c) =>
         c.classList.toggle('active', c.id === 'card-' + newId)
@@ -1605,8 +1612,14 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     const t = clock.getElapsedTime();
     if (!reduceMotion) {
       kioskMeshes.forEach((k, i) => {
-        k.crystal.rotation.y = t * 0.8 + i;
+        const visited = visitedKiosks.has(k.id);
+        k.crystal.rotation.y = t * (visited ? 1.6 : 0.8) + i;
         k.crystal.position.y = 7.4 + Math.sin(t * 1.5 + i) * 0.25;
+        if (visited) {
+          k.pillar.material.emissiveIntensity = 3.2 + Math.sin(t * 2.1 + i) * 0.5;
+          k.crystal.material.emissiveIntensity = 2.4 + Math.sin(t * 1.5 + i) * 0.4;
+          k.beam.intensity = 50 + Math.sin(t * 1.8 + i) * 8;
+        }
         k.pring.rotation.z = t * 0.5;
         // Drift sparkles upward, wrap at top
         const pos = k.sparkles.geometry.attributes.position;
@@ -1614,7 +1627,9 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
           pos.setY(j, (k.sparkPhase[j] + t * k.sparkSpeed[j]) % 6.2);
         }
         pos.needsUpdate = true;
-        k.sparkles.material.opacity = 0.6 + Math.sin(t * 2.1 + i) * 0.25;
+        k.sparkles.material.opacity = visited
+          ? 0.85 + Math.sin(t * 2.1 + i) * 0.15
+          : 0.6 + Math.sin(t * 2.1 + i) * 0.25;
       });
       plaza.rotation.z = t * 0.2;
       // Fire logo flicker on rear plate
