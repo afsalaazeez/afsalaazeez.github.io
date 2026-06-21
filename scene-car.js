@@ -182,26 +182,43 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
   // HELPERS — text label sprite from a canvas
   // ========================================================================
   function makeLabel(text, hex) {
+    const W = 768, H = 200;
     const cvs = document.createElement('canvas');
-    cvs.width = 512;
-    cvs.height = 128;
+    cvs.width = W; cvs.height = H;
     const ctx = cvs.getContext('2d');
-    ctx.fillStyle = 'rgba(8,12,20,0.0)';
-    ctx.fillRect(0, 0, 512, 128);
-    ctx.font = '700 64px Outfit, Arial, sans-serif';
+    ctx.clearRect(0, 0, W, H);
+
+    const col = '#' + new THREE.Color(hex).getHexString();
+    const cx = W / 2, cy = H / 2;
+    ctx.font = '700 72px Outfit, Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-    ctx.strokeText(text, 256, 70);
-    ctx.fillStyle = '#' + new THREE.Color(hex).getHexString();
-    ctx.fillText(text, 256, 70);
+    try { ctx.letterSpacing = '6px'; } catch (_) {}
+
+    // Pass 1 — wide outer halo
+    ctx.globalAlpha = 0.45;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 70;
+    ctx.fillStyle = col;
+    ctx.fillText(text, cx, cy);
+
+    // Pass 2 — mid glow
+    ctx.globalAlpha = 0.75;
+    ctx.shadowBlur = 32;
+    ctx.fillText(text, cx, cy);
+
+    // Pass 3 — crisp bright core (white-hot centre)
+    ctx.globalAlpha = 1.0;
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, cx, cy);
+
     const tex = new THREE.CanvasTexture(cvs);
     tex.anisotropy = 4;
     const sprite = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })
     );
-    sprite.scale.set(8, 2, 1);
+    sprite.scale.set(10, 2.6, 1);
     return sprite;
   }
 
@@ -535,7 +552,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       new THREE.MeshStandardMaterial({
         color: 0x030810,
         emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 1.1,
+        emissiveIntensity: 0.18,
         emissiveMap: runeTex,
         roughness: 0.55,
         metalness: 0.15,
@@ -551,7 +568,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       new THREE.MeshStandardMaterial({
         color,
         emissive: color,
-        emissiveIntensity: 1.1,
+        emissiveIntensity: 0.25,
         roughness: 0.2,
         metalness: 0.4,
       })
@@ -561,7 +578,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     group.add(crystal);
 
     // Beacon light
-    const beam = new THREE.PointLight(color, 18, 18);
+    const beam = new THREE.PointLight(color, 3, 18);
     beam.position.y = 6;
     group.add(beam);
 
@@ -601,8 +618,36 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     group.add(sparkles);
 
     scene.add(group);
-    kioskMeshes.push({ ...k, group, crystal, pring, sparkles, sparkPhase, sparkSpeed, pos: new THREE.Vector3(x, ky, z) });
+    kioskMeshes.push({ ...k, group, pillar, crystal, beam, pring, sparkles, sparkPhase, sparkSpeed, pos: new THREE.Vector3(x, ky, z) });
   });
+
+  // --- Score / coin collection ---
+  const visitedKiosks = new Set();
+  const scoreHUD = document.createElement('div');
+  scoreHUD.id = 'score-hud';
+  scoreHUD.innerHTML = `🪙 <span id="score-val">0</span>&thinsp;/&thinsp;<span id="score-max">${kioskMeshes.length}</span>`;
+  document.body.appendChild(scoreHUD);
+
+  function awardCoin(id) {
+    document.getElementById('score-val').textContent = visitedKiosks.size;
+    const pop = document.createElement('div');
+    pop.className = 'coin-popup';
+    pop.textContent = '+1 🪙';
+    document.body.appendChild(pop);
+    pop.addEventListener('animationend', () => pop.remove());
+    scoreHUD.classList.remove('score-pop');
+    void scoreHUD.offsetWidth; // restart animation
+    scoreHUD.classList.add('score-pop');
+    if (visitedKiosks.size === kioskMeshes.length)
+      setTimeout(() => scoreHUD.classList.add('score-complete'), 400);
+    // Light up the pillar permanently on first visit
+    const km = kioskMeshes.find((m) => m.id === id);
+    if (km) {
+      km.pillar.material.emissiveIntensity = 4.5;
+      km.beam.intensity = 55;
+      km.crystal.material.emissiveIntensity = 2.8;
+    }
+  }
 
   // ========================================================================
   // SCENERY — low-poly trees (pine + round-crowned). Materials stored for
@@ -1394,6 +1439,10 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     const newId = nearest ? nearest.id : null;
     if (newId !== activeKiosk) {
       activeKiosk = newId;
+      if (newId && !visitedKiosks.has(newId)) {
+        visitedKiosks.add(newId);
+        awardCoin(newId);
+      }
       document.querySelectorAll('.info-card').forEach((c) =>
         c.classList.toggle('active', c.id === 'card-' + newId)
       );
@@ -1580,8 +1629,14 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     const t = clock.getElapsedTime();
     if (!reduceMotion) {
       kioskMeshes.forEach((k, i) => {
-        k.crystal.rotation.y = t * 0.8 + i;
+        const visited = visitedKiosks.has(k.id);
+        k.crystal.rotation.y = t * (visited ? 1.6 : 0.8) + i;
         k.crystal.position.y = 7.4 + Math.sin(t * 1.5 + i) * 0.25;
+        if (visited) {
+          k.pillar.material.emissiveIntensity = 3.2 + Math.sin(t * 2.1 + i) * 0.5;
+          k.crystal.material.emissiveIntensity = 2.4 + Math.sin(t * 1.5 + i) * 0.4;
+          k.beam.intensity = 50 + Math.sin(t * 1.8 + i) * 8;
+        }
         k.pring.rotation.z = t * 0.5;
         // Drift sparkles upward, wrap at top
         const pos = k.sparkles.geometry.attributes.position;
@@ -1589,7 +1644,9 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
           pos.setY(j, (k.sparkPhase[j] + t * k.sparkSpeed[j]) % 6.2);
         }
         pos.needsUpdate = true;
-        k.sparkles.material.opacity = 0.6 + Math.sin(t * 2.1 + i) * 0.25;
+        k.sparkles.material.opacity = visited
+          ? 0.85 + Math.sin(t * 2.1 + i) * 0.15
+          : 0.6 + Math.sin(t * 2.1 + i) * 0.25;
       });
       plaza.rotation.z = t * 0.2;
       // Fire logo flicker on rear plate
