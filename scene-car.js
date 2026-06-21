@@ -640,6 +640,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     scoreHUD.classList.add('score-pop');
     if (visitedKiosks.size === kioskMeshes.length)
       setTimeout(() => scoreHUD.classList.add('score-complete'), 400);
+    _playCoinChime();
     // Light up the pillar permanently on first visit
     const km = kioskMeshes.find((m) => m.id === id);
     if (km) {
@@ -648,6 +649,93 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       km.crystal.material.emissiveIntensity = 2.8;
     }
   }
+
+  // ========================================================================
+  // SOUND SYSTEM — Web Audio API, all sounds generated procedurally
+  // ========================================================================
+  let _actx = null;
+  let _engOsc = null, _engOsc2 = null, _engGain = null, _engFilter = null;
+
+  function _getCtx() {
+    if (!_actx) _actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_actx.state === 'suspended') _actx.resume();
+    return _actx;
+  }
+
+  function _initEngine() {
+    if (_engOsc) return;
+    const ctx = _getCtx();
+    _engFilter = ctx.createBiquadFilter();
+    _engFilter.type = 'lowpass';
+    _engFilter.frequency.value = 300;
+    _engGain = ctx.createGain();
+    _engGain.gain.value = 0;
+    _engFilter.connect(_engGain);
+    _engGain.connect(ctx.destination);
+    _engOsc = ctx.createOscillator();
+    _engOsc.type = 'sawtooth';
+    _engOsc.frequency.value = 55;
+    _engOsc.connect(_engFilter);
+    _engOsc.start();
+    _engOsc2 = ctx.createOscillator();
+    _engOsc2.type = 'square';
+    _engOsc2.frequency.value = 28;
+    const sub = ctx.createGain();
+    sub.gain.value = 0.3;
+    _engOsc2.connect(sub);
+    sub.connect(_engFilter);
+    _engOsc2.start();
+  }
+
+  function _tickEngine(speed) {
+    if (!_actx || !_engOsc) return;
+    const abs = Math.abs(speed);
+    const t = _actx.currentTime;
+    const freq = 55 + (abs / MAX_SPEED) * 90;
+    _engOsc.frequency.setTargetAtTime(freq, t, 0.08);
+    _engOsc2.frequency.setTargetAtTime(freq * 0.5, t, 0.08);
+    _engFilter.frequency.setTargetAtTime(200 + (abs / MAX_SPEED) * 700, t, 0.05);
+    _engGain.gain.setTargetAtTime(abs > 0.5 ? 0.15 : 0, t, abs > 0.5 ? 0.15 : 0.5);
+  }
+
+  function _playCoinChime() {
+    const ctx = _getCtx();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(300, t);
+    osc.frequency.exponentialRampToValueAtTime(1200, t + 0.28);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.28, t + 0.02);
+    g.gain.setValueAtTime(0.28, t + 0.22);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.42);
+  }
+
+  function _playKioskWhomp() {
+    const ctx = _getCtx();
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(200, t);
+    osc.frequency.exponentialRampToValueAtTime(55, t + 0.3);
+    g.gain.setValueAtTime(0.28, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.48);
+  }
+
+  // Lazy-init engine on first user gesture (browser autoplay policy)
+  window.addEventListener('keydown', _initEngine, { once: true });
+  window.addEventListener('pointerdown', _initEngine, { once: true });
+  document.addEventListener('visibilitychange', () => {
+    if (!_actx) return;
+    if (document.hidden) _actx.suspend();
+    else _actx.resume();
+  });
 
   // ========================================================================
   // SCENERY — low-poly trees (pine + round-crowned). Materials stored for
@@ -1439,6 +1527,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     const newId = nearest ? nearest.id : null;
     if (newId !== activeKiosk) {
       activeKiosk = newId;
+      if (newId) _playKioskWhomp();
       if (newId && !visitedKiosks.has(newId)) {
         visitedKiosks.add(newId);
         awardCoin(newId);
@@ -1547,6 +1636,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
       else state.speed = 0;
     }
     state.speed = THREE.MathUtils.clamp(state.speed, -MAX_SPEED * 0.5, MAX_SPEED);
+    _tickEngine(state.speed);
 
     // --- Steering (proportional to speed, inverts in reverse) ---
     if (state.speed !== 0) {
