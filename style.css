@@ -340,6 +340,23 @@ button, input, textarea {
   align-items: center;
   gap: 1rem;
 }
+.cv-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-heading);
+  border-radius: var(--border-radius-full);
+  background: var(--gradient-hero);
+  color: #fff;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 2px 10px var(--accent-glow);
+}
+.cv-download-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 
 /* Theme Toggle Button */
 .theme-toggle {
