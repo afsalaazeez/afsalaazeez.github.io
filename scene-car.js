@@ -604,6 +604,27 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     kioskMeshes.push({ ...k, group, crystal, pring, sparkles, sparkPhase, sparkSpeed, pos: new THREE.Vector3(x, ky, z) });
   });
 
+  // --- Score / coin collection ---
+  const visitedKiosks = new Set();
+  const scoreHUD = document.createElement('div');
+  scoreHUD.id = 'score-hud';
+  scoreHUD.innerHTML = `🪙 <span id="score-val">0</span>&thinsp;/&thinsp;<span id="score-max">${kioskMeshes.length}</span>`;
+  document.body.appendChild(scoreHUD);
+
+  function awardCoin() {
+    document.getElementById('score-val').textContent = visitedKiosks.size;
+    const pop = document.createElement('div');
+    pop.className = 'coin-popup';
+    pop.textContent = '+1 🪙';
+    document.body.appendChild(pop);
+    pop.addEventListener('animationend', () => pop.remove());
+    scoreHUD.classList.remove('score-pop');
+    void scoreHUD.offsetWidth; // restart animation
+    scoreHUD.classList.add('score-pop');
+    if (visitedKiosks.size === kioskMeshes.length)
+      setTimeout(() => scoreHUD.classList.add('score-complete'), 400);
+  }
+
   // ========================================================================
   // SCENERY — low-poly trees (pine + round-crowned). Materials stored for
   // dynamic theme switching between dark silhouettes and bright meadow greens.
@@ -1394,6 +1415,10 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
     const newId = nearest ? nearest.id : null;
     if (newId !== activeKiosk) {
       activeKiosk = newId;
+      if (newId && !visitedKiosks.has(newId)) {
+        visitedKiosks.add(newId);
+        awardCoin();
+      }
       document.querySelectorAll('.info-card').forEach((c) =>
         c.classList.toggle('active', c.id === 'card-' + newId)
       );
