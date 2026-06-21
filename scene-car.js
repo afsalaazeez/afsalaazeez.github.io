@@ -701,18 +701,17 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
   function _playCoinChime() {
     const ctx = _getCtx();
     const t = ctx.currentTime;
-    [[660, 0.0, 0.55], [990, 0.07, 0.45], [1320, 0.14, 0.38]].forEach(([freq, delay, dur]) => {
-      const osc = ctx.createOscillator();
-      const g = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq * 0.8, t + delay);
-      osc.frequency.exponentialRampToValueAtTime(freq, t + delay + 0.06);
-      g.gain.setValueAtTime(0, t + delay);
-      g.gain.linearRampToValueAtTime(0.22, t + delay + 0.03);
-      g.gain.exponentialRampToValueAtTime(0.001, t + delay + dur);
-      osc.connect(g); g.connect(ctx.destination);
-      osc.start(t + delay); osc.stop(t + delay + dur + 0.05);
-    });
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(300, t);
+    osc.frequency.exponentialRampToValueAtTime(1200, t + 0.28);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.28, t + 0.02);
+    g.gain.setValueAtTime(0.28, t + 0.22);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+    osc.connect(g); g.connect(ctx.destination);
+    osc.start(t); osc.stop(t + 0.42);
   }
 
   function _playKioskWhomp() {
@@ -732,6 +731,11 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
   // Lazy-init engine on first user gesture (browser autoplay policy)
   window.addEventListener('keydown', _initEngine, { once: true });
   window.addEventListener('pointerdown', _initEngine, { once: true });
+  document.addEventListener('visibilitychange', () => {
+    if (!_actx) return;
+    if (document.hidden) _actx.suspend();
+    else _actx.resume();
+  });
 
   // ========================================================================
   // SCENERY — low-poly trees (pine + round-crowned). Materials stored for
