@@ -182,26 +182,43 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
   // HELPERS — text label sprite from a canvas
   // ========================================================================
   function makeLabel(text, hex) {
+    const W = 768, H = 200;
     const cvs = document.createElement('canvas');
-    cvs.width = 512;
-    cvs.height = 128;
+    cvs.width = W; cvs.height = H;
     const ctx = cvs.getContext('2d');
-    ctx.fillStyle = 'rgba(8,12,20,0.0)';
-    ctx.fillRect(0, 0, 512, 128);
-    ctx.font = '700 64px Outfit, Arial, sans-serif';
+    ctx.clearRect(0, 0, W, H);
+
+    const col = '#' + new THREE.Color(hex).getHexString();
+    const cx = W / 2, cy = H / 2;
+    ctx.font = '700 72px Outfit, Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.lineWidth = 8;
-    ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-    ctx.strokeText(text, 256, 70);
-    ctx.fillStyle = '#' + new THREE.Color(hex).getHexString();
-    ctx.fillText(text, 256, 70);
+    try { ctx.letterSpacing = '6px'; } catch (_) {}
+
+    // Pass 1 — wide outer halo
+    ctx.globalAlpha = 0.45;
+    ctx.shadowColor = col;
+    ctx.shadowBlur = 70;
+    ctx.fillStyle = col;
+    ctx.fillText(text, cx, cy);
+
+    // Pass 2 — mid glow
+    ctx.globalAlpha = 0.75;
+    ctx.shadowBlur = 32;
+    ctx.fillText(text, cx, cy);
+
+    // Pass 3 — crisp bright core (white-hot centre)
+    ctx.globalAlpha = 1.0;
+    ctx.shadowBlur = 10;
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, cx, cy);
+
     const tex = new THREE.CanvasTexture(cvs);
     tex.anisotropy = 4;
     const sprite = new THREE.Sprite(
       new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false })
     );
-    sprite.scale.set(8, 2, 1);
+    sprite.scale.set(10, 2.6, 1);
     return sprite;
   }
 
