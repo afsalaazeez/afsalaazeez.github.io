@@ -1,14 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { CanvasWrapper } from './components/CanvasWrapper'
+import { projects } from './data/projects'
+
+// Web3Forms access key. Public by design (it ships to the browser), but kept
+// configurable via env so it isn't hard-coded. Falls back to the existing key
+// so local/CI builds work without extra setup. Override with VITE_WEB3FORMS_KEY.
+const WEB3FORMS_ACCESS_KEY =
+  import.meta.env.VITE_WEB3FORMS_KEY || 'e1667dec-80cf-4c3a-ab85-bf5ec7e8d755'
 
 export default function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(
     () => (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
   )
-  const [listMode, setListMode] = useState(false)
-  const [helpVisible, setHelpVisible] = useState(true)
+  // Touch devices default to list mode with the help overlay hidden.
+  const isTouch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
+  const [listMode, setListMode] = useState(isTouch)
+  const [helpVisible, setHelpVisible] = useState(!isTouch)
   const typingRef = useRef<HTMLSpanElement>(null)
-  const statusRef = useRef<HTMLDivElement>(null)
+
+  // Contact form — controlled state
+  const [contact, setContact] = useState({ name: '', email: '', subject: '', message: '' })
+  const [submitting, setSubmitting] = useState(false)
+  const [status, setStatus] = useState<{ type: '' | 'success' | 'error'; msg: string }>({ type: '', msg: '' })
 
   // Sync theme to <html data-theme> and fire event for the 3D scene
   useEffect(() => {
@@ -21,12 +34,8 @@ export default function App() {
     document.body.classList.toggle('list-mode', listMode)
   }, [listMode])
 
-  // Auto list-mode on touch devices + close help on first drive key
+  // Close the help overlay on the first drive key
   useEffect(() => {
-    if (navigator.maxTouchPoints > 0) {
-      setHelpVisible(false)
-      setListMode(true)
-    }
     const onDriveKey = (e: KeyboardEvent) => {
       if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD'].includes(e.code)) {
         setHelpVisible(false)
@@ -70,42 +79,39 @@ export default function App() {
   const closeHelp = () => setHelpVisible(false)
   const openListFromHelp = () => { closeHelp(); setListMode(true) }
 
+  const updateContact = (field: keyof typeof contact) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      setContact(c => ({ ...c, [field]: e.target.value }))
+
   const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
-    const statusEl = statusRef.current
-    if (!statusEl) return
-    const name    = (form.querySelector('#form-name')    as HTMLInputElement).value.trim()
-    const email   = (form.querySelector('#form-email')   as HTMLInputElement).value.trim()
-    const subject = (form.querySelector('#form-subject') as HTMLInputElement).value.trim()
-    const message = (form.querySelector('#form-message') as HTMLTextAreaElement).value.trim()
-    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement
+    const name = contact.name.trim()
+    const email = contact.email.trim()
+    const subject = contact.subject.trim()
+    const message = contact.message.trim()
     const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
-    const showStatus = (msg: string, type: string) => {
-      statusEl.textContent = msg
-      statusEl.className = 'form-status ' + type
-      if (type === 'success') setTimeout(() => { statusEl.className = 'form-status'; statusEl.style.display = 'none' }, 7000)
-    }
-    if (!name || !email || !subject || !message) return showStatus('Please fill in all fields.', 'error')
-    if (!validateEmail(email)) return showStatus('Please provide a valid email address.', 'error')
-    const orig = submitBtn.innerHTML
-    submitBtn.disabled = true
-    submitBtn.textContent = 'Sending message...'
+    if (!name || !email || !subject || !message) return setStatus({ type: 'error', msg: 'Please fill in all fields.' })
+    if (!validateEmail(email)) return setStatus({ type: 'error', msg: 'Please provide a valid email address.' })
+    setSubmitting(true)
+    setStatus({ type: '', msg: '' })
     try {
       const res = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ name, email, subject, message, access_key: 'e1667dec-80cf-4c3a-ab85-bf5ec7e8d755' }),
+        body: JSON.stringify({ name, email, subject, message, access_key: WEB3FORMS_ACCESS_KEY }),
       })
       const data = await res.json()
-      submitBtn.disabled = false
-      submitBtn.innerHTML = orig
-      if (res.status === 200) { showStatus('Thank you! Your message was sent successfully.', 'success'); form.reset() }
-      else showStatus(data.message || 'An error occurred. Please try again.', 'error')
+      if (res.status === 200) {
+        setStatus({ type: 'success', msg: 'Thank you! Your message was sent successfully.' })
+        setContact({ name: '', email: '', subject: '', message: '' })
+        setTimeout(() => setStatus({ type: '', msg: '' }), 7000)
+      } else {
+        setStatus({ type: 'error', msg: data.message || 'An error occurred. Please try again.' })
+      }
     } catch {
-      submitBtn.disabled = false
-      submitBtn.innerHTML = orig
-      showStatus('Network error. Please email directly.', 'error')
+      setStatus({ type: 'error', msg: 'Network error. Please email directly.' })
+    } finally {
+      setSubmitting(false)
     }
   }
 
@@ -217,59 +223,18 @@ export default function App() {
             </div>
           </article>
 
-          {/* PROJECT: GovShield */}
-          <article className="info-card glass" id="card-p-rag">
-            <span className="card-kicker">Project · Secure RAG</span>
-            <h2>GovShield — Offline RAG Portal</h2>
-            <div className="project-tags"><span className="project-tag">LlamaIndex</span><span className="project-tag">pgvector</span><span className="project-tag">FastAPI</span><span className="project-tag">RBAC</span></div>
-            <p>100% offline RAG system with RBAC pre-filtering at the vector store layer — access control enforced before retrieval, not after. LlamaIndex + Ollama + PostgreSQL pgvector + FastAPI REST API. Dockerized two-service deployment.</p>
-            <a href="https://github.com/zencodelab/raglearn" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-          </article>
-
-          {/* PROJECT: TaskEngine */}
-          <article className="info-card glass" id="card-p-agent">
-            <span className="card-kicker">Project · Autonomous Agent</span>
-            <h2>TaskEngine — Autonomous Agent</h2>
-            <div className="project-tags"><span className="project-tag">LangChain</span><span className="project-tag">LangGraph</span><span className="project-tag">Pinecone</span><span className="project-tag">FastAPI</span></div>
-            <p>Plan→Execute→Reflect loop: a LangChain planner decomposes queries into atomic steps, a LangGraph ReAct executor runs each with tools (web search, code execution, file I/O), and a reflector scores quality and re-plans on failure. Pinecone stores past runs as few-shot context.</p>
-            <a href="https://github.com/zencodelab/aiautonomous" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-          </article>
-
-          {/* PROJECT: VisionLog */}
-          <article className="info-card glass" id="card-p-vision">
-            <span className="card-kicker">Project · Vision AI</span>
-            <h2>VisionLog-MLX</h2>
-            <div className="project-tags"><span className="project-tag">Python</span><span className="project-tag">OpenCV</span><span className="project-tag">Ollama</span><span className="project-tag">Apple Silicon</span></div>
-            <p>On-device vision logger using OpenCV for motion detection, dlib for face recognition, and Ollama Gemma for real-time scene description. Fully offline on Apple Silicon via Metal acceleration.</p>
-            <a href="https://github.com/zencodelab/MehvishLog" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-          </article>
-
-          {/* PROJECT: GIS */}
-          <article className="info-card glass" id="card-p-gis">
-            <span className="card-kicker">Project · GIS Database</span>
-            <h2>GIS Water Network DB</h2>
-            <div className="project-tags"><span className="project-tag">Python</span><span className="project-tag">SQL</span><span className="project-tag">QGIS</span><span className="project-tag">EPANET</span></div>
-            <p>A GIS-integrated water network database application in QGIS using Python and SQL. Automates node elevation extraction and workflows for EPANET and JalTantra.</p>
-            <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-          </article>
-
-          {/* PROJECT: Chat */}
-          <article className="info-card glass" id="card-p-chat">
-            <span className="card-kicker">Project · Real-Time Web</span>
-            <h2>Real-Time Messaging Platform</h2>
-            <div className="project-tags"><span className="project-tag">Flask</span><span className="project-tag">Socket.IO</span><span className="project-tag">Elasticsearch</span></div>
-            <p>A Flask-based real-time coordination and workspace system using Socket.IO for bi-directional messaging and Elasticsearch for fast query indexing.</p>
-            <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-          </article>
-
-          {/* PROJECT: Flight */}
-          <article className="info-card glass" id="card-p-flight">
-            <span className="card-kicker">Project · Predictive ML</span>
-            <h2>Flight Delay Predictor</h2>
-            <div className="project-tags"><span className="project-tag">Python</span><span className="project-tag">XGBoost</span><span className="project-tag">SMOTE</span></div>
-            <p>A binary classification engine using Python and XGBoost to predict delays exceeding 15 minutes, solving heavy class imbalance with SMOTE.</p>
-            <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-          </article>
+          {/* PROJECTS — data-driven from src/data/projects.ts */}
+          {projects.map(p => (
+            <article className="info-card glass" id={`card-${p.id}`} key={p.id}>
+              <span className="card-kicker">{p.kicker}</span>
+              <h2>{p.title}</h2>
+              <div className="project-tags">
+                {p.tags.map(tag => <span className="project-tag" key={tag}>{tag}</span>)}
+              </div>
+              <p>{p.description}</p>
+              <a href={p.href} target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
+            </article>
+          ))}
 
           {/* CONTACT */}
           <article className="info-card glass" id="card-contact">
@@ -286,13 +251,13 @@ export default function App() {
             </div>
             <form className="contact-form" id="portfolio-contact-form" noValidate style={{ padding:0, marginTop:'1rem' }} onSubmit={handleContactSubmit}>
               <div className="form-grid">
-                <div className="form-group form-group-full"><label htmlFor="form-name">Full Name</label><div className="form-input-wrapper"><input type="text" id="form-name" name="name" className="form-input" placeholder="Your name" required /></div></div>
-                <div className="form-group form-group-full"><label htmlFor="form-email">Email</label><div className="form-input-wrapper"><input type="email" id="form-email" name="email" className="form-input" placeholder="email@domain.com" required /></div></div>
-                <div className="form-group form-group-full"><label htmlFor="form-subject">Subject</label><div className="form-input-wrapper"><input type="text" id="form-subject" name="subject" className="form-input" placeholder="Collaboration proposal" required /></div></div>
-                <div className="form-group form-group-full"><label htmlFor="form-message">Message</label><div className="form-input-wrapper"><textarea id="form-message" name="message" className="form-input" placeholder="Hi Afsal..." required /></div></div>
+                <div className="form-group form-group-full"><label htmlFor="form-name">Full Name</label><div className="form-input-wrapper"><input type="text" id="form-name" name="name" className="form-input" placeholder="Your name" required value={contact.name} onChange={updateContact('name')} /></div></div>
+                <div className="form-group form-group-full"><label htmlFor="form-email">Email</label><div className="form-input-wrapper"><input type="email" id="form-email" name="email" className="form-input" placeholder="email@domain.com" required value={contact.email} onChange={updateContact('email')} /></div></div>
+                <div className="form-group form-group-full"><label htmlFor="form-subject">Subject</label><div className="form-input-wrapper"><input type="text" id="form-subject" name="subject" className="form-input" placeholder="Collaboration proposal" required value={contact.subject} onChange={updateContact('subject')} /></div></div>
+                <div className="form-group form-group-full"><label htmlFor="form-message">Message</label><div className="form-input-wrapper"><textarea id="form-message" name="message" className="form-input" placeholder="Hi Afsal..." required value={contact.message} onChange={updateContact('message')} /></div></div>
               </div>
-              <button type="submit" className="btn btn-primary" style={{ width:'100%', marginTop:'1rem' }}>Transmit Message</button>
-              <div id="form-status" className="form-status" ref={statusRef}></div>
+              <button type="submit" className="btn btn-primary" style={{ width:'100%', marginTop:'1rem' }} disabled={submitting}>{submitting ? 'Sending message...' : 'Transmit Message'}</button>
+              {status.msg && <div id="form-status" className={`form-status ${status.type}`} role="status" aria-live="polite">{status.msg}</div>}
             </form>
           </article>
         </div>

@@ -1,0 +1,14 @@
+#:schema https://conductor.build/schemas/settings.repo.schema.json
+
+[scripts]
+# npm project (package-lock.json, no pnpm/yarn). `npm ci` is reproducible,
+# non-interactive, and safe to run in a fresh worktree.
+setup = "npm ci"
+
+# Vite dev server. `--` forwards the port flag through npm to vite, and
+# CONDUCTOR_PORT gives each workspace its own port so they don't collide.
+run = "npm run dev -- --port $CONDUCTOR_PORT"
+
+# Static SPA with no shared local resource (no DB/Docker/fixed port), so
+# multiple workspaces can run their dev servers at the same time.
+run_mode = "concurrent"
