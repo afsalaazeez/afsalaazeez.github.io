@@ -1,6 +1,11 @@
-import { useEffect, useRef, useState } from 'react'
-import { CanvasWrapper } from './components/CanvasWrapper'
+import { useEffect, useRef, useState, lazy, Suspense } from 'react'
 import { projects } from './data/projects'
+
+// Lazy-load the 3D world so Three.js (~550 kB) ships as a separate async
+// chunk and never blocks the first paint of the nav, help card, and list view.
+const CanvasWrapper = lazy(() =>
+  import('./components/CanvasWrapper').then(m => ({ default: m.CanvasWrapper })),
+)
 
 // Web3Forms access key. Public by design (it ships to the browser), but kept
 // configurable via env so it isn't hard-coded. Falls back to the existing key
@@ -124,8 +129,10 @@ export default function App() {
 
   return (
     <>
-      {/* 3D world — fixed background layer */}
-      <CanvasWrapper />
+      {/* 3D world — fixed background layer, lazy-loaded off the critical path */}
+      <Suspense fallback={<div className="canvas-loading" aria-hidden="true" />}>
+        <CanvasWrapper />
+      </Suspense>
 
       {/* SEO: Primary heading for search engines (visually hidden) */}
       <h1 className="sr-only">Afsal A Azeez — Full-Stack &amp; AI Engineer | IIT Bombay M.Tech Portfolio</h1>
@@ -170,7 +177,7 @@ export default function App() {
             <span className="card-kicker">About My Journey</span>
             <div className="profile-photo-wrap">
               <div className="profile-photo-ring">
-                <img src="/assets/Profile.jpg" alt="Afsal A Azeez" className="profile-photo" />
+                <img src="/assets/Profile.jpg" alt="Afsal A Azeez" className="profile-photo" width={256} height={255} loading="lazy" decoding="async" />
               </div>
             </div>
             <h2>Afsal A Azeez</h2>

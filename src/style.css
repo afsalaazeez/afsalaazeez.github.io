@@ -647,6 +647,15 @@ button, input, textarea {
   font-size: 1.05rem;
 }
 
+/* Backdrop shown while the lazy 3D world chunk downloads — matches the page
+   background so there is no white flash before the canvas mounts. */
+.canvas-loading {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: var(--bg-primary);
+}
+
 .profile-photo-wrap {
   display: flex;
   justify-content: center;
