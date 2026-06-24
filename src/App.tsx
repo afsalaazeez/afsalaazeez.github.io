@@ -29,9 +29,11 @@ export default function App() {
     window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }))
   }, [theme])
 
-  // Sync list-mode class on body
+  // Sync list-mode class on body. Fire an event so the 3D scene can pause its
+  // render loop while the list is open and resume when it closes.
   useEffect(() => {
     document.body.classList.toggle('list-mode', listMode)
+    window.dispatchEvent(new CustomEvent('listmodechange', { detail: { listMode } }))
   }, [listMode])
 
   // Close the help overlay on the first drive key

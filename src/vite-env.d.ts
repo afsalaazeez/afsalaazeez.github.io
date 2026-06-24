@@ -21,4 +21,5 @@ interface Window {
 
 interface WindowEventMap {
   themechange: CustomEvent<{ theme: 'dark' | 'light' }>;
+  listmodechange: CustomEvent<{ listMode: boolean }>;
 }
