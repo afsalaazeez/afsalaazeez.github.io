@@ -14,6 +14,9 @@ import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeom
 export function initCarWorld(container: HTMLDivElement): () => void {
   // Create and mount canvas inside the React-managed container
   const canvas = document.createElement('canvas');
+  // id is what `.list-mode #world { display:none }` targets — keep it so the
+  // canvas hides (and the render loop pauses) when the list view is open.
+  canvas.id = 'world';
   canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;display:block;';
   container.appendChild(canvas);
 
@@ -30,6 +33,15 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   const ac = new AbortController();
   const sig = { signal: ac.signal };
   let rafId: number;
+  let running = false; // is the render loop currently scheduling frames?
+
+  // Low-power tier: phones/tablets. Coarse pointer + touch, or a narrow screen.
+  // Gates shadows, extra lights, texture resolution, and scene density.
+  const LOW_POWER =
+    (typeof navigator !== 'undefined' &&
+      navigator.maxTouchPoints > 0 &&
+      window.matchMedia('(pointer: coarse)').matches) ||
+    window.innerWidth < 820;
 
   // ========================================================================
   // KIOSK DEFINITIONS — each maps to an .info-card in the DOM (by id)
@@ -55,13 +67,14 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   // ========================================================================
   const renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: true,
+    antialias: !LOW_POWER,
     powerPreference: 'high-performance',
   });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, LOW_POWER ? 1 : 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  // Shadows are the single biggest GPU cost — disable the whole pass on mobile.
+  renderer.shadowMap.enabled = !LOW_POWER;
+  if (!LOW_POWER) renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x070b15);
@@ -132,7 +145,7 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   // GROUND + GRID
   // ========================================================================
   // Bumpy terrain: PlaneGeometry with per-vertex height displacement
-  const terrainGeo = new THREE.PlaneGeometry(150, 150, 64, 64);
+  const terrainGeo = new THREE.PlaneGeometry(150, 150, LOW_POWER ? 32 : 64, LOW_POWER ? 32 : 64);
   terrainGeo.rotateX(-Math.PI / 2);
   const terrPos = terrainGeo.attributes.position;
   for (let i = 0; i < terrPos.count; i++) {
@@ -229,10 +242,14 @@ export function initCarWorld(container: HTMLDivElement): () => void {
 
   // Canvas texture — single grand arcane composition (used as emissiveMap)
   function makeRuneTexture(color, idx = 0) {
+    // Logical drawing space stays 1024² (all coords below assume it); the actual
+    // texture is half-res on mobile to cut VRAM from ~36MB to ~9MB across 9 kiosks.
     const W = 1024, H = 1024;
+    const RES = LOW_POWER ? 512 : 1024;
     const cvs = document.createElement('canvas');
-    cvs.width = W; cvs.height = H;
+    cvs.width = RES; cvs.height = RES;
     const ctx = cvs.getContext('2d');
+    ctx.scale(RES / W, RES / H);
 
     // Unique seed per pillar so each kiosk gets a distinct pattern
     const cr = Math.round(color.r * 255), cg = Math.round(color.g * 255), cb = Math.round(color.b * 255);
@@ -582,10 +599,12 @@ export function initCarWorld(container: HTMLDivElement): () => void {
     crystal.castShadow = true;
     group.add(crystal);
 
-    // Beacon light
+    // Beacon light. On mobile, 9 of these (+ hemi + sun = 11 lights) is the
+    // dominant per-fragment cost, so we keep the emissive glow but skip adding
+    // the light to the scene. Writes to beam.intensity elsewhere stay harmless.
     const beam = new THREE.PointLight(color, 3, 18);
     beam.position.y = 6;
-    group.add(beam);
+    if (!LOW_POWER) group.add(beam);
 
     // Floating label, billboarded
     const label = makeLabel(k.label, k.color);
@@ -602,7 +621,7 @@ export function initCarWorld(container: HTMLDivElement): () => void {
     group.add(pring);
 
     // Floating sparkle particles around the pillar
-    const SPARK_N = 28;
+    const SPARK_N = LOW_POWER ? 10 : 28;
     const sparkPos   = new Float32Array(SPARK_N * 3);
     const sparkPhase = new Float32Array(SPARK_N);
     const sparkSpeed = new Float32Array(SPARK_N);
@@ -737,9 +756,11 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   window.addEventListener('keydown', _initEngine, { once: true, signal: ac.signal });
   window.addEventListener('pointerdown', _initEngine, { once: true, signal: ac.signal });
   document.addEventListener('visibilitychange', () => {
-    if (!_actx) return;
-    if (document.hidden) _actx.suspend();
-    else _actx.resume();
+    if (_actx) {
+      if (document.hidden) _actx.suspend();
+      else _actx.resume();
+    }
+    if (!document.hidden) resume(); // restart the render loop on refocus
   }, sig);
 
   // ========================================================================
@@ -747,8 +768,9 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   // dynamic theme switching between dark silhouettes and bright meadow greens.
   // ========================================================================
   const treeData = [];
-  for (let i = 0; i < 38; i++) {
-    const angle = (i / 38) * Math.PI * 2 + (Math.random() - 0.5) * 0.28;
+  const TREE_COUNT = LOW_POWER ? 22 : 38;
+  for (let i = 0; i < TREE_COUNT; i++) {
+    const angle = (i / TREE_COUNT) * Math.PI * 2 + (Math.random() - 0.5) * 0.28;
     const r = 38 + Math.random() * 24;
     const x = Math.cos(angle) * r;
     const z = Math.sin(angle) * r;
@@ -815,8 +837,9 @@ export function initCarWorld(container: HTMLDivElement): () => void {
     const cEyeMat    = new THREE.MeshStandardMaterial({ color: 0x080808, roughness: 0.9  });
     const cWingMat   = new THREE.MeshStandardMaterial({ color: 0xd8d8c8, roughness: 0.85 });
 
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2 + Math.random() * 0.5;
+    const CHICKEN_COUNT = LOW_POWER ? 4 : 8;
+    for (let i = 0; i < CHICKEN_COUNT; i++) {
+      const angle = (i / CHICKEN_COUNT) * Math.PI * 2 + Math.random() * 0.5;
       const r = 10 + Math.random() * 26;
       const cx = Math.cos(angle) * r;
       const cz = Math.sin(angle) * r;
@@ -1627,6 +1650,13 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   const camGoal = new THREE.Vector3();
 
   function tick() {
+    // Pause entirely when the list view is open or the tab is hidden. In list
+    // mode the canvas is display:none, so rendering it (and forcing the glass
+    // cards' backdrop-filter to re-blur every frame) is pure wasted GPU.
+    if (document.hidden || document.body.classList.contains('list-mode')) {
+      running = false;
+      return; // resume() reschedules when we become visible again
+    }
     let dt = clock.getDelta();
     if (dt > 0.05) dt = 0.05; // clamp big frame gaps
 
@@ -1819,6 +1849,17 @@ export function initCarWorld(container: HTMLDivElement): () => void {
     rafId = requestAnimationFrame(tick);
   }
 
+  // Restart the loop after a pause (list view closed, or tab refocused).
+  function resume() {
+    if (running) return;
+    if (document.hidden || document.body.classList.contains('list-mode')) return;
+    running = true;
+    clock.getDelta(); // drop the accumulated pause gap so dt doesn't spike
+    rafId = requestAnimationFrame(tick);
+  }
+  window.addEventListener('listmodechange', resume, sig);
+
+  running = true;
   rafId = requestAnimationFrame(() => {
     document.body.classList.add('world-ready');
     tick();
@@ -1826,7 +1867,23 @@ export function initCarWorld(container: HTMLDivElement): () => void {
 
   return function cleanup() {
     cancelAnimationFrame(rafId);
+    running = false;
     ac.abort();
+    // Free GPU resources — renderer.dispose() alone leaks geometries/materials/
+    // textures, which matters on StrictMode's dev double-mount.
+    scene.traverse((obj: any) => {
+      if (obj.geometry) obj.geometry.dispose();
+      const mats = obj.material
+        ? (Array.isArray(obj.material) ? obj.material : [obj.material])
+        : [];
+      mats.forEach((m: any) => {
+        for (const key in m) {
+          const val = m[key];
+          if (val && val.isTexture) val.dispose();
+        }
+        m.dispose();
+      });
+    });
     renderer.dispose();
     canvas.remove();
     inspectHUD.remove();
