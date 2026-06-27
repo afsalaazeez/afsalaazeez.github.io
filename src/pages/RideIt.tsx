@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { CanvasWrapper } from './components/CanvasWrapper'
-import { projects } from './data/projects'
+import { Link } from 'react-router-dom'
+import { CanvasWrapper } from '../components/CanvasWrapper'
+import { ThemeToggle } from '../components/ThemeToggle'
+import { projects } from '../data/projects'
+import { useTheme } from '../hooks/useTheme'
+import '../style-car.css' // car-world styles; split into this route's lazy chunk
 
 // Web3Forms access key. Public by design (it ships to the browser), but kept
 // configurable via env so it isn't hard-coded. Falls back to the existing key
@@ -8,10 +12,8 @@ import { projects } from './data/projects'
 const WEB3FORMS_ACCESS_KEY =
   import.meta.env.VITE_WEB3FORMS_KEY || 'e1667dec-80cf-4c3a-ab85-bf5ec7e8d755'
 
-export default function App() {
-  const [theme, setTheme] = useState<'dark' | 'light'>(
-    () => (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
-  )
+export default function RideIt() {
+  const { toggleTheme } = useTheme()
   // Touch devices default to list mode with the help overlay hidden.
   const isTouch = typeof navigator !== 'undefined' && navigator.maxTouchPoints > 0
   const [listMode, setListMode] = useState(isTouch)
@@ -23,11 +25,15 @@ export default function App() {
   const [submitting, setSubmitting] = useState(false)
   const [status, setStatus] = useState<{ type: '' | 'success' | 'error'; msg: string }>({ type: '', msg: '' })
 
-  // Sync theme to <html data-theme> and fire event for the 3D scene
+  // Activate the full-screen, no-scroll car-world layout only while this route
+  // is mounted (body.ride-active gates the overflow:hidden rule in style-car.css).
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    window.dispatchEvent(new CustomEvent('themechange', { detail: { theme } }))
-  }, [theme])
+    document.body.classList.add('ride-active')
+    return () => {
+      document.body.classList.remove('ride-active')
+      document.body.classList.remove('list-mode')
+    }
+  }, [])
 
   // Sync list-mode class on body. Fire an event so the 3D scene can pause its
   // render loop while the list is open and resume when it closes.
@@ -67,13 +73,6 @@ export default function App() {
     type()
     return () => clearTimeout(timer)
   }, [])
-
-  const toggleTheme = () =>
-    setTheme(t => {
-      const next = t === 'dark' ? 'light' : 'dark'
-      localStorage.setItem('theme', next)
-      return next
-    })
 
   const goTo = (id: string | null) => window.CarControls?.goTo(id)
   const press = (dir: string, on: boolean) => window.CarControls?.press(dir, on)
@@ -151,12 +150,10 @@ export default function App() {
               <li><a href="#" data-kiosk="contact" onClick={e => { e.preventDefault(); goTo('contact') }}>Contact</a></li>
             </ul>
             <div className="nav-actions">
+              <Link to="/" className="cv-download-btn" style={{ background: 'transparent', color: 'var(--text-primary)', border: '1px solid var(--card-border)' }}>← Portfolio</Link>
               <a href="/assets/Afsal_A_Azeez_CV.pdf" download="Afsal_A_Azeez_CV.pdf" className="cv-download-btn">↓ Download CV</a>
               <button className="list-toggle-btn" id="list-toggle" title="View all content as a list" onClick={() => setListMode(true)}>☰ List view</button>
-              <button className="theme-toggle" id="theme-toggle" aria-label="Toggle visual theme" title="Switch Theme" onClick={toggleTheme}>
-                <svg className="sun-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-                <svg className="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-              </button>
+              <ThemeToggle onClick={toggleTheme} />
             </div>
           </div>
         </nav>

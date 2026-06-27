@@ -7,14 +7,16 @@
   =========================================
 */
 
+/* These car-world body rules apply only while the /rideit route is mounted
+   (RideIt adds/removes .ride-active), so the scrolling home page is unaffected. */
 html, body {
   height: 100%;
 }
-body {
+body.ride-active {
   background-color: #070b15;
   overflow: hidden; /* the world fills the screen; no page scroll while driving */
 }
-[data-theme='light'] body {
+[data-theme='light'] body.ride-active {
   background-color: #7ec8e3;
 }
 
