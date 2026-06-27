@@ -13,11 +13,8 @@ html, body {
   height: 100%;
 }
 body.ride-active {
-  background-color: #070b15;
+  background-color: var(--bg-primary);
   overflow: hidden; /* the world fills the screen; no page scroll while driving */
-}
-[data-theme='light'] body.ride-active {
-  background-color: #7ec8e3;
 }
 
 /* The world canvas fills the viewport behind the UI */
