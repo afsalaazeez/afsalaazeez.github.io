@@ -29,14 +29,15 @@
   --text-primary: #fafafa;
   --text-secondary: #a1a1aa;   /* zinc-400 */
   --text-muted: #71717a;       /* zinc-500 */
-  --accent-primary: #6b8afd;   /* muted ink-blue (used sparingly) */
-  --accent-secondary: #8aa0ff; /* lighter ink-blue */
-  --accent-glow: rgba(107, 138, 253, 0.10);
+  --accent-primary: #fafafa;   /* neutral light accent (no hue) */
+  --accent-secondary: #d4d4d8; /* zinc-300 */
+  --accent-glow: rgba(255, 255, 255, 0.08);
+  --on-accent: #0a0a0b;        /* dark text on the light accent surface */
   --card-bg: rgba(24, 24, 27, 0.55);   /* zinc-900 glass */
   --card-border: rgba(255, 255, 255, 0.07);
-  --card-border-hover: rgba(107, 138, 253, 0.32);
+  --card-border-hover: rgba(255, 255, 255, 0.28);
   --nav-bg: rgba(10, 10, 11, 0.72);
-  --gradient-hero: linear-gradient(135deg, #6b8afd 0%, #4f6fe0 100%);
+  --gradient-hero: linear-gradient(135deg, #fafafa 0%, #d4d4d8 100%);
   --gradient-text: linear-gradient(135deg, #fafafa 30%, #a1a1aa 100%);
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
@@ -51,14 +52,15 @@
   --text-primary: #0a0a0b;
   --text-secondary: #52525b;   /* zinc-600 */
   --text-muted: #71717a;       /* zinc-500 */
-  --accent-primary: #3f5bd9;   /* ink-blue */
-  --accent-secondary: #5b73e8;
-  --accent-glow: rgba(63, 91, 217, 0.10);
+  --accent-primary: #18181b;   /* neutral near-black accent (no hue) */
+  --accent-secondary: #3f3f46; /* zinc-700 */
+  --accent-glow: rgba(10, 10, 11, 0.06);
+  --on-accent: #ffffff;        /* light text on the dark accent surface */
   --card-bg: rgba(255, 255, 255, 0.70);
   --card-border: rgba(10, 10, 11, 0.08);
-  --card-border-hover: rgba(63, 91, 217, 0.30);
+  --card-border-hover: rgba(10, 10, 11, 0.28);
   --nav-bg: rgba(255, 255, 255, 0.78);
-  --gradient-hero: linear-gradient(135deg, #3f5bd9 0%, #2f49c0 100%);
+  --gradient-hero: linear-gradient(135deg, #18181b 0%, #0a0a0b 100%);
   --gradient-text: linear-gradient(135deg, #0a0a0b 30%, #52525b 100%);
   --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.06);
@@ -192,7 +194,7 @@ button, input, textarea {
 
 .btn-primary {
   background: var(--gradient-hero);
-  color: #ffffff;
+  color: var(--on-accent);
   box-shadow: 0 4px 15px var(--accent-glow);
 }
 .btn-primary:hover {
@@ -273,11 +275,10 @@ button, input, textarea {
   width: 36px;
   height: 36px;
   transition: transform var(--transition-fast), filter var(--transition-fast);
-  filter: drop-shadow(0 0 4px rgba(107, 138, 253, 0.20));
+  filter: none;
 }
 .logo:hover .logo-icon {
   transform: scale(1.08) rotate(-4deg);
-  filter: drop-shadow(0 0 8px rgba(107, 138, 253, 0.40));
 }
 .logo-text {
   font-family: var(--font-heading);
@@ -300,8 +301,8 @@ button, input, textarea {
   animation: logoPulse 2s ease-in-out infinite;
 }
 @keyframes logoPulse {
-  0%, 100% { box-shadow: 0 0 4px var(--accent-primary); }
-  50% { box-shadow: 0 0 10px var(--accent-primary), 0 0 18px rgba(107, 138, 253, 0.15); }
+  0%, 100% { box-shadow: 0 0 4px var(--accent-glow); }
+  50% { box-shadow: 0 0 10px var(--accent-primary); }
 }
 
 .nav-links {
@@ -350,7 +351,7 @@ button, input, textarea {
   font-family: var(--font-heading);
   border-radius: var(--border-radius-full);
   background: var(--gradient-hero);
-  color: #fff;
+  color: var(--on-accent);
   text-decoration: none;
   white-space: nowrap;
   transition: opacity 0.2s, transform 0.2s;
@@ -460,7 +461,7 @@ button, input, textarea {
   background: var(--accent-glow);
   padding: 0.4rem 1rem;
   border-radius: var(--border-radius-full);
-  border: 1px solid rgba(107, 138, 253, 0.22);
+  border: 1px solid var(--card-border);
 }
 
 .hero h1 {
@@ -658,7 +659,7 @@ button, input, textarea {
   border-radius: 50%;
   padding: 3px;
   background: var(--gradient-hero);
-  box-shadow: 0 0 18px rgba(107, 138, 253, 0.22);
+  box-shadow: 0 0 18px var(--accent-glow);
 }
 .profile-photo {
   width: 100%;
@@ -1048,7 +1049,7 @@ button, input, textarea {
 }
 .form-input:focus {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(107, 138, 253, 0.15);
+  box-shadow: 0 0 0 3px var(--accent-glow);
 }
 textarea.form-input {
   resize: vertical;
