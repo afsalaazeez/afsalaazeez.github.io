@@ -45,7 +45,7 @@ export const projects: Project[] = [
     tags: ['Python', 'SQL', 'QGIS', 'EPANET'],
     description:
       'A GIS-integrated water network database application in QGIS using Python and SQL. Automates node elevation extraction and workflows for EPANET and JalTantra.',
-    href: 'https://github.com/afsalaazeez',
+    href: 'https://github.com/zencodelab',
   },
   {
     id: 'p-chat',
@@ -54,7 +54,7 @@ export const projects: Project[] = [
     tags: ['Flask', 'Socket.IO', 'Elasticsearch'],
     description:
       'A Flask-based real-time coordination and workspace system using Socket.IO for bi-directional messaging and Elasticsearch for fast query indexing.',
-    href: 'https://github.com/afsalaazeez',
+    href: 'https://github.com/zencodelab',
   },
   {
     id: 'p-flight',
@@ -63,6 +63,6 @@ export const projects: Project[] = [
     tags: ['Python', 'XGBoost', 'SMOTE'],
     description:
       'A binary classification engine using Python and XGBoost to predict delays exceeding 15 minutes, solving heavy class imbalance with SMOTE.',
-    href: 'https://github.com/afsalaazeez',
+    href: 'https://github.com/zencodelab',
   },
 ]
