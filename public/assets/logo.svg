@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
   <defs>
     <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#00f2fe"/>
-      <stop offset="50%" stop-color="#4facfe"/>
-      <stop offset="100%" stop-color="#7f00ff"/>
+      <stop offset="0%" stop-color="#f7e3a1"/>
+      <stop offset="50%" stop-color="#e3b341"/>
+      <stop offset="100%" stop-color="#9c6b1f"/>
     </linearGradient>
     <linearGradient id="logoGradLight" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#3b82f6"/>
-      <stop offset="50%" stop-color="#6366f1"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
+      <stop offset="0%" stop-color="#e9c75f"/>
+      <stop offset="50%" stop-color="#c9962a"/>
+      <stop offset="100%" stop-color="#8a5a16"/>
     </linearGradient>
   </defs>
   <!-- Hexagonal border -->
