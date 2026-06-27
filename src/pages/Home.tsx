@@ -207,7 +207,7 @@ export default function Home() {
               </div>
               <div className="hero-socials">
                 <span>Find me</span>
-                <a className="social-icon" href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg viewBox="0 0 24 24">{GITHUB_ICON}</svg></a>
+                <a className="social-icon" href="https://github.com/zencodelab" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><svg viewBox="0 0 24 24">{GITHUB_ICON}</svg></a>
                 <a className="social-icon" href="https://linkedin.com/in/afsalaazeez" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><svg viewBox="0 0 24 24">{LINKEDIN_ICON}</svg></a>
               </div>
             </div>
@@ -366,9 +366,9 @@ export default function Home() {
                     <div className="contact-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ width: 20, height: 20 }}>{LINKEDIN_ICON}</svg></div>
                     <div className="contact-details"><span>LinkedIn</span><strong>linkedin.com/in/afsalaazeez</strong></div>
                   </a>
-                  <a className="contact-card glass glass-interactive" href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer">
+                  <a className="contact-card glass glass-interactive" href="https://github.com/zencodelab" target="_blank" rel="noopener noreferrer">
                     <div className="contact-icon"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ width: 20, height: 20 }}>{GITHUB_ICON}</svg></div>
-                    <div className="contact-details"><span>GitHub</span><strong>github.com/afsalaazeez</strong></div>
+                    <div className="contact-details"><span>GitHub</span><strong>github.com/zencodelab</strong></div>
                   </a>
                 </div>
               </div>
@@ -394,7 +394,7 @@ export default function Home() {
           <p className="footer-text">© {new Date().getFullYear()} Afsal A Azeez. Built with React, TypeScript &amp; Vite.</p>
           <div className="footer-links">
             <Link to="/rideit">Ride It 🚗</Link>
-            <a href="https://github.com/afsalaazeez" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://github.com/zencodelab" target="_blank" rel="noopener noreferrer">GitHub</a>
             <a href="https://linkedin.com/in/afsalaazeez" target="_blank" rel="noopener noreferrer">LinkedIn</a>
           </div>
         </div>
