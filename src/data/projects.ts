@@ -6,11 +6,22 @@ export interface Project {
   title: string
   tags: string[]
   description: string
-  /** External link (GitHub repo). */
-  href: string
+  /** External link (GitHub repo or live demo). Omit for private client work. */
+  href?: string
 }
 
 export const projects: Project[] = [
+  {
+    // Deliberately vague: the product concept is the client's IP, so this card
+    // shows only the domain and the engineering work, not the feature set.
+    id: 'p-client',
+    kicker: 'Freelance · Confidential Client',
+    title: 'Automotive AI Platform — Freelance MVP',
+    tags: ['Python', 'FastAPI', 'React', 'Claude API', 'Docker'],
+    description:
+      "Confidential MVP for a UAE-based automotive client. Built an AI engine on Anthropic's Claude API with structured JSON output, a catalog system with live pricing, and a booking flow with server-side validation. Shipped as a Dockerized FastAPI + React (Vite) stack with graceful offline AI fallback. Product details under wraps at the client's request.",
+    // href intentionally omitted — private client project
+  },
   {
     id: 'p-rag',
     kicker: 'Project · Secure RAG',
