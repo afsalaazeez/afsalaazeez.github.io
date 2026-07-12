@@ -231,11 +231,7 @@ export default function RideIt() {
                 {p.tags.map(tag => <span className="project-tag" key={tag}>{tag}</span>)}
               </div>
               <p>{p.description}</p>
-              {p.href ? (
-                <a href={p.href} target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
-              ) : (
-                <span className="btn btn-secondary" style={{ opacity: 0.75, cursor: 'default' }}>🔒 Private client project</span>
-              )}
+              <a href={p.href} target="_blank" rel="noopener noreferrer" className="btn btn-primary">View on GitHub →</a>
             </article>
           ))}
 

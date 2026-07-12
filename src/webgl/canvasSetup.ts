@@ -49,7 +49,6 @@ export function initCarWorld(container: HTMLDivElement): () => void {
   const KIOSKS = [
     { id: 'about',    label: 'ABOUT',        color: 0x00f2fe },
     { id: 'skills',   label: 'SKILLS',       color: 0x4f8bff },
-    { id: 'p-partix', label: 'PartixAI',     color: 0xffb020 },
     { id: 'p-rag',    label: 'GovShield',    color: 0x00ffa3 },
     { id: 'p-agent',  label: 'TaskEngine',   color: 0x7f00ff },
     { id: 'p-vision', label: 'VisionLog',    color: 0x00ffa3 },

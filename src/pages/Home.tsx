@@ -317,14 +317,12 @@ export default function Home() {
                   <div className="project-img-wrapper">
                     {PROJECT_ICON}
                     <div className="project-img-overlay">
-                      <span className="project-tag">{p.kicker.replace(/^[^·]*·\s*/, '')}</span>
-                      {p.href && (
-                        <div className="project-overlay-links">
-                          <a className="social-icon" href={p.href} target="_blank" rel="noopener noreferrer" aria-label={`${p.title} repository`} style={{ width: 38, height: 38 }}>
-                            <svg viewBox="0 0 24 24">{GITHUB_ICON}</svg>
-                          </a>
-                        </div>
-                      )}
+                      <span className="project-tag">{p.kicker.replace('Project · ', '')}</span>
+                      <div className="project-overlay-links">
+                        <a className="social-icon" href={p.href} target="_blank" rel="noopener noreferrer" aria-label={`${p.title} on GitHub`} style={{ width: 38, height: 38 }}>
+                          <svg viewBox="0 0 24 24">{GITHUB_ICON}</svg>
+                        </a>
+                      </div>
                     </div>
                   </div>
                   <div className="project-body">
@@ -334,17 +332,10 @@ export default function Home() {
                     <h3 className="project-title">{p.title}</h3>
                     <p className="project-desc">{p.description}</p>
                     <div className="project-links">
-                      {p.href ? (
-                        <a className="project-link" href={p.href} target="_blank" rel="noopener noreferrer">
-                          <svg viewBox="0 0 24 24" fill="currentColor">{GITHUB_ICON}</svg>
-                          View on GitHub
-                        </a>
-                      ) : (
-                        <span className="project-link" style={{ color: 'var(--text-muted)', cursor: 'default' }}>
-                          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm3 8H9V6a3 3 0 0 1 6 0v3z" /></svg>
-                          Private client project
-                        </span>
-                      )}
+                      <a className="project-link" href={p.href} target="_blank" rel="noopener noreferrer">
+                        <svg viewBox="0 0 24 24" fill="currentColor">{GITHUB_ICON}</svg>
+                        View on GitHub
+                      </a>
                     </div>
                   </div>
                 </article>
