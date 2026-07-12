@@ -6,11 +6,20 @@ export interface Project {
   title: string
   tags: string[]
   description: string
-  /** External link (GitHub repo). */
-  href: string
+  /** External link (GitHub repo or live demo). Omit for private client work. */
+  href?: string
 }
 
 export const projects: Project[] = [
+  {
+    id: 'p-partix',
+    kicker: 'Freelance · Automotive AI',
+    title: 'PartixAI — Automotive Intelligence Network',
+    tags: ['Python', 'FastAPI', 'React', 'Claude API', 'Docker'],
+    description:
+      'AI-powered automotive marketplace MVP for a UAE auto-parts distributor. A Claude API diagnosis engine (structured JSON output) turns natural-language symptom descriptions into repair plans — likely causes, matched parts, ranked workshops, and instant quotes — backed by a multi-tier parts catalog (genuine/aftermarket/used) with live quote recalculation, a ~110-item RTA-compliant vehicle modification catalog, and a unified workshop/car-wash/logistics booking flow with server-side double-booking validation. Fully Dockerized FastAPI + React (Vite) with graceful offline AI fallback.',
+    // href intentionally omitted — private client project
+  },
   {
     id: 'p-rag',
     kicker: 'Project · Secure RAG',
