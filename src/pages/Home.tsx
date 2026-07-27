@@ -245,7 +245,8 @@ export default function Home() {
                   I specialize in scalable distributed microservices and
                   production-grade AI/LLM applications. Alumnus of IIT Bombay
                   (M.Tech), AIR-241 in GATE CS, with 5+ years building full-stack
-                  and AI systems at a venture-backed startup.
+                  and AI systems — now Founder of Markaba AI, an AI-powered
+                  automotive diagnostics and marketplace platform.
                 </p>
                 <p>
                   My recent work spans secure offline RAG portals, autonomous
@@ -266,6 +267,12 @@ export default function Home() {
                   Experience
                 </h4>
                 <div className="timeline">
+                  <div className="timeline-item">
+                    <div className="timeline-dot"></div>
+                    <span className="timeline-time">2026 - Present</span>
+                    <h4 className="timeline-header">Founder <span>- Markaba AI</span></h4>
+                    <p className="timeline-desc">AI Automotive Intelligence Platform (markabaai.com) — diagnoses vehicle symptoms, matches a real parts catalog, ranks the workshop network, and composes a bookable repair quotation end-to-end. Built solo with FastAPI, React, Claude, and pgvector.</p>
+                  </div>
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <span className="timeline-time">2020 - 2026</span>

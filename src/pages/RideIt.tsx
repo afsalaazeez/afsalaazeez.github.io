@@ -173,7 +173,7 @@ export default function RideIt() {
               </div>
             </div>
             <h2>Afsal A Azeez</h2>
-            <p>Full-Stack &amp; AI Engineer specializing in scalable distributed microservices and production-grade AI/LLM applications. Alumnus of IIT Bombay (M.Tech), AIR-241 in GATE CS, with 5+ years building full-stack and AI systems at a venture-backed startup.</p>
+            <p>Full-Stack &amp; AI Engineer specializing in scalable distributed microservices and production-grade AI/LLM applications. Alumnus of IIT Bombay (M.Tech), AIR-241 in GATE CS, with 5+ years building full-stack and AI systems — now Founder of Markaba AI, an AI-powered automotive diagnostics and marketplace platform.</p>
             <a href="/assets/Afsal_A_Azeez_CV.pdf" download="Afsal_A_Azeez_CV.pdf" className="btn btn-primary" style={{ marginTop:'1rem', marginBottom:'0.25rem', width:'100%', justifyContent:'center' }}>↓ Download CV</a>
             <div className="about-stats">
               <div className="stat-card glass"><span className="stat-num">5+</span><span className="stat-label">Years Exp</span></div>
@@ -181,6 +181,12 @@ export default function RideIt() {
               <div className="stat-card glass"><span className="stat-num">IIT</span><span className="stat-label">Bombay M.Tech</span></div>
             </div>
             <div className="timeline" style={{ marginTop:'1.5rem' }}>
+              <div className="timeline-item">
+                <div className="timeline-dot"></div>
+                <span className="timeline-time">2026 - Present</span>
+                <h4 className="timeline-header">Founder <span>- Markaba AI</span></h4>
+                <p className="timeline-desc">AI Automotive Intelligence Platform (markabaai.com) — diagnoses vehicle symptoms, matches a real parts catalog, ranks the workshop network, and composes a bookable repair quotation end-to-end. Built solo with FastAPI, React, Claude, and pgvector.</p>
+              </div>
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <span className="timeline-time">2020 - 2026</span>
