@@ -43,6 +43,9 @@ const PROJECT_ICON = (
     <path d="M14.5 4l-5 16" />
   </svg>
 )
+const EXTERNAL_LINK_ICON = (
+  <path d="M14 3h7v7h-2V6.41l-9.29 9.3-1.42-1.42 9.3-9.29H14V3zM5 5h6v2H5v12h12v-6h2v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+)
 
 export default function Home() {
   const { toggleTheme } = useTheme()
@@ -327,8 +330,8 @@ export default function Home() {
                       <span className="project-tag">{p.kicker.replace(/^[^·]*·\s*/, '')}</span>
                       {p.href && (
                         <div className="project-overlay-links">
-                          <a className="social-icon" href={p.href} target="_blank" rel="noopener noreferrer" aria-label={`${p.title} repository`} style={{ width: 38, height: 38 }}>
-                            <svg viewBox="0 0 24 24">{GITHUB_ICON}</svg>
+                          <a className="social-icon" href={p.href} target="_blank" rel="noopener noreferrer" aria-label={p.linkType === 'site' ? `${p.title} website` : `${p.title} repository`} style={{ width: 38, height: 38 }}>
+                            <svg viewBox="0 0 24 24">{p.linkType === 'site' ? EXTERNAL_LINK_ICON : GITHUB_ICON}</svg>
                           </a>
                         </div>
                       )}
@@ -343,8 +346,8 @@ export default function Home() {
                     <div className="project-links">
                       {p.href ? (
                         <a className="project-link" href={p.href} target="_blank" rel="noopener noreferrer">
-                          <svg viewBox="0 0 24 24" fill="currentColor">{GITHUB_ICON}</svg>
-                          View on GitHub
+                          <svg viewBox="0 0 24 24" fill="currentColor">{p.linkType === 'site' ? EXTERNAL_LINK_ICON : GITHUB_ICON}</svg>
+                          {p.linkType === 'site' ? 'Visit Site' : 'View on GitHub'}
                         </a>
                       ) : (
                         <span className="project-link" style={{ color: 'var(--text-muted)', cursor: 'default' }}>
