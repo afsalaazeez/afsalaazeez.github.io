@@ -8,19 +8,20 @@ export interface Project {
   description: string
   /** External link (GitHub repo or live demo). Omit for private client work. */
   href?: string
+  /** 'site' renders a live-site link/icon instead of the default GitHub repo styling. */
+  linkType?: 'repo' | 'site'
 }
 
 export const projects: Project[] = [
   {
-    // Deliberately vague: the product concept is the client's IP, so this card
-    // shows only the domain and the engineering work, not the feature set.
-    id: 'p-client',
-    kicker: 'Freelance · Confidential Client',
-    title: 'Automotive AI Platform — Freelance MVP',
-    tags: ['Python', 'FastAPI', 'React', 'Claude API', 'Docker'],
+    id: 'p-markaba',
+    kicker: 'Founder · Markaba AI',
+    title: 'Markaba AI — Automotive Intelligence Platform',
+    tags: ['Python', 'FastAPI', 'React', 'Claude API', 'pgvector', 'Docker'],
     description:
-      "Confidential MVP for a UAE-based automotive client. Built an AI engine on Anthropic's Claude API with structured JSON output, a catalog system with live pricing, and a booking flow with server-side validation. Shipped as a Dockerized FastAPI + React (Vite) stack with graceful offline AI fallback. Product details under wraps at the client's request.",
-    // href intentionally omitted — private client project
+      'Solo-founded and built Markaba AI (markabaai.com): an AI automotive intelligence platform with a multi-layer engine (Diagnose → Match → Rank → Quote) on the Claude API that converts natural-language vehicle symptoms into matched parts, ranked workshops, and bookable repair quotes. RAG-based parts matching with LlamaIndex + pgvector, bilingual (English/Arabic) React + Vite frontend, FastAPI backend — zero to live production within three weeks of the first commit.',
+    href: 'https://markabaai.com',
+    linkType: 'site',
   },
   {
     id: 'p-rag',
