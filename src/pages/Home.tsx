@@ -93,7 +93,7 @@ export default function Home() {
     const el = typingRef.current
     if (!el) return
     const node = el
-    const roles = ['Full-Stack Developer', 'GenAI Architect', 'Systems Engineer']
+    const roles = ['Backend & Platform Engineer', 'GenAI Architect', 'Full-Stack Engineer', 'Systems Engineer']
     let r = 0, c = 0, deleting = false
     let timer: ReturnType<typeof setTimeout>
     function type() {
@@ -200,8 +200,8 @@ export default function Home() {
               </div>
               <p className="hero-desc">
                 IIT Bombay M.Tech with 5+ years shipping production full-stack and
-                AI/LLM systems — RAG pipelines, autonomous agents, and scalable
-                distributed services. AIR-241 in GATE CS.
+                AI/LLM systems — developer platforms, RAG pipelines, autonomous
+                agents, and scalable distributed services. AIR-241 in GATE CS.
               </p>
               <div className="hero-btns">
                 <a href="#projects" className="btn btn-primary">View Projects</a>
@@ -280,7 +280,7 @@ export default function Home() {
                     <div className="timeline-dot"></div>
                     <span className="timeline-time">2020 - 2026</span>
                     <h4 className="timeline-header">Member of Technical Staff <span>- Zettabytes (Roost.ai)</span></h4>
-                    <p className="timeline-desc">Full-stack &amp; AI engineer: Kubernetes visualisation UI, Electron desktop app, a Java AST parsing service (93% compile rate), MS Teams bot, Git platform integrations, and a multi-LLM provider UI dashboard.</p>
+                    <p className="timeline-desc">Developer platforms and AI tooling for enterprise engineering teams. Owned RoostGPT&apos;s end-to-end Java unit test generation pipeline — 93% compile success, 4× test coverage, 85% less manual testing — and redesigned the Java AST schema (316KB → 17KB per class). Earlier: the Environments-as-a-Service dashboard, a Kubernetes topology UI, and a cross-platform Electron app.</p>
                   </div>
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
