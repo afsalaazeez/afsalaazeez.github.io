@@ -19,7 +19,7 @@ export const projects: Project[] = [
     title: 'Markaba AI — Automotive Intelligence Platform',
     tags: ['Python', 'FastAPI', 'React', 'Claude API', 'pgvector', 'Docker'],
     description:
-      'Solo-founded and built Markaba AI (markabaai.com): an AI automotive intelligence platform with a multi-layer engine (Diagnose → Match → Rank → Quote) on the Claude API that converts natural-language vehicle symptoms into matched parts, ranked workshops, and bookable repair quotes. RAG-based parts matching with LlamaIndex + pgvector, bilingual (English/Arabic) React + Vite frontend, FastAPI backend — zero to live production within three weeks of the first commit.',
+      'Solo-founded and built Markaba AI (markabaai.com): an AI automotive intelligence platform with a multi-layer engine (Diagnose → Match → Rank → Quote) on the Claude API that converts natural-language vehicle symptoms into matched parts, ranked workshops, and bookable repair quotes. RAG-based parts matching with LlamaIndex + pgvector, bilingual (English/Arabic) React + Vite frontend, FastAPI backend — zero to live production within two weeks of the first commit.',
     href: 'https://markabaai.com',
     linkType: 'site',
   },
