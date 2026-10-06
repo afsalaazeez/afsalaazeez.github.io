@@ -200,8 +200,8 @@ export default function Home() {
               </div>
               <p className="hero-desc">
                 IIT Bombay M.Tech with 5+ years shipping production full-stack and
-                AI/LLM systems — developer platforms, RAG pipelines, autonomous
-                agents, and scalable distributed services. AIR-241 in GATE CS.
+                AI/LLM systems — developer platforms, LLM-powered products,
+                and scalable distributed services. AIR-241 in GATE CS.
               </p>
               <div className="hero-btns">
                 <a href="#projects" className="btn btn-primary">View Projects</a>
@@ -252,10 +252,10 @@ export default function Home() {
                   automotive diagnostics and marketplace platform.
                 </p>
                 <p>
-                  My recent work spans secure offline RAG portals, autonomous
-                  Plan→Execute→Reflect agents, and on-device vision systems —
-                  always with an eye on performance, security, and clean
-                  architecture.
+                  Alongside it I build smaller projects to learn: a building
+                  digital twin with a human-approved AI copilot, a RAG portal
+                  with access control at retrieval time, a Plan→Execute→Reflect
+                  agent loop, and a local vision logger.
                 </p>
                 <div className="about-stats">
                   <div className="stat-card glass"><span className="stat-num">5+</span><span className="stat-label">Years Exp</span></div>
@@ -273,8 +273,8 @@ export default function Home() {
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
                     <span className="timeline-time">2026 - Present</span>
-                    <h4 className="timeline-header">Founder <span>- Markaba AI</span></h4>
-                    <p className="timeline-desc">AI Automotive Intelligence Platform (markabaai.com) — diagnoses vehicle symptoms, matches a real parts catalog, ranks the workshop network, and composes a bookable repair quotation end-to-end. Built solo with FastAPI, React, Claude, and pgvector.</p>
+                    <h4 className="timeline-header">Founder &amp; Lead Engineer <span>- Markaba AI</span></h4>
+                    <p className="timeline-desc">AI Automotive Intelligence Platform (markabaai.com) — diagnoses vehicle symptoms, matches a real parts catalog, ranks the workshop network, and composes a bookable repair quotation end-to-end. Built with Claude Code as the primary coding tool on FastAPI, React, PostgreSQL, and the Claude API; I owned the requirements, product and design decisions.</p>
                   </div>
                   <div className="timeline-item">
                     <div className="timeline-dot"></div>
@@ -319,7 +319,7 @@ export default function Home() {
           <div className="container">
             <div className="section-header reveal">
               <h2>Featured Projects</h2>
-              <p>Production-minded builds across RAG, agents, vision, and data.</p>
+              <p>A product I founded, plus personal and academic builds across RAG, agents, vision, and data.</p>
             </div>
             <div className="projects-grid">
               {projects.map((p, i) => (

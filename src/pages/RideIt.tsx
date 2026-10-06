@@ -184,8 +184,8 @@ export default function RideIt() {
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
                 <span className="timeline-time">2026 - Present</span>
-                <h4 className="timeline-header">Founder <span>- Markaba AI</span></h4>
-                <p className="timeline-desc">AI Automotive Intelligence Platform (markabaai.com) — diagnoses vehicle symptoms, matches a real parts catalog, ranks the workshop network, and composes a bookable repair quotation end-to-end. Built solo with FastAPI, React, Claude, and pgvector.</p>
+                <h4 className="timeline-header">Founder &amp; Lead Engineer <span>- Markaba AI</span></h4>
+                <p className="timeline-desc">AI Automotive Intelligence Platform (markabaai.com) — diagnoses vehicle symptoms, matches a real parts catalog, ranks the workshop network, and composes a bookable repair quotation end-to-end. Built with Claude Code as the primary coding tool on FastAPI, React, PostgreSQL, and the Claude API; I owned the requirements, product and design decisions.</p>
               </div>
               <div className="timeline-item">
                 <div className="timeline-dot"></div>
